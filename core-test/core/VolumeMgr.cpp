@@ -17,7 +17,7 @@
 ///:VolumeMgr.cpp
 
 #include "VolumeMgr.h"
-#include "..\ulti\Log.h"
+#include "../ulti/Log.h"
 using namespace std;
 
 VolInfoMgr::VolInfoMgr()
