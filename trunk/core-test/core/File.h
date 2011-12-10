@@ -30,8 +30,8 @@ typedef __int32 TIME32;
 /**
 * TIME32 syntax:
 *     year    month    day     hour    minute
-* 0000000   0000    00000  00000   000000
-*     7bits     4bits     5bits    5bits     6bits
+*     0...0      0000    00000  00000   000000
+*    12bits     4bits     5bits    5bits     6bits
 *
 * And year is started with TIME32_YEAR_START,
 * in this case 1980.
