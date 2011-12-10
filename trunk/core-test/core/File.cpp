@@ -47,23 +47,29 @@ inline BY_HANDLE_FILE_INFORMATION File_Info (std::wstring Filepath)
 __forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime)
 {
     TIME32 time32;
-    time32 = sysTime.wMinute;
-    time32 |= (sysTime.wHour << 6);
-    time32 |= (sysTime.wDay << 11);
-    time32 |= (DWORD (sysTime.wMonth) << 16);
-    time32 |= (DWORD (sysTime.wYear - TIME32_YEAR_START) << 20);
+    time32 = (sysTime.wYear - TIME32_YEAR_START) * 12;
+    time32 = (time32 + sysTime.wMonth) * 31;
+    time32 = (time32 + sysTime.wDay) * 24;
+    time32 = (time32 + sysTime.wHour) * 60;
+    time32 += sysTime.wMinute;
     return time32;
 }
 __forceinline void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime)
 {
-    sysTime.wMinute = time32 & 0x3f;
-    time32 >>= 6;
-    sysTime.wHour = time32 & 0x1f;
-    time32 >>= 5;
-    sysTime.wDay = time32 & 0x1f;
-    time32 >>= 5;
-    sysTime.wMonth = time32 & 0xf;
-    time32 >>= 4;
+    sysTime.wMinute = time32 % 60;
+    time32 /= 60;
+    sysTime.wHour = time32 % 24;
+    time32 /= 24;
+    sysTime.wDay = time32 % 31;
+
+    if (sysTime.wDay == 0) sysTime.wDay = 31;
+
+    time32 /= 31;
+    sysTime.wMonth = time32 % 12;
+
+    if (sysTime.wMonth == 0) sysTime.wMonth = 12;
+
+    time32 /= 12;
     sysTime.wYear = time32 + TIME32_YEAR_START;
 }
 ///:~

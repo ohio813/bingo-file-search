@@ -25,17 +25,14 @@ bool Directory_Exist (std::wstring Directorypath);
 bool Directory_Empty (std::wstring Directorypath);
 BY_HANDLE_FILE_INFORMATION File_Info (std::wstring Filepath); // didn't check whether file exists
 
-typedef __int32 TIME32;
-#define TIME32_YEAR_START 1980
+typedef unsigned __int32 TIME32;
+#define TIME32_YEAR_START 1970
 /**
-* TIME32 syntax:
-*     year    month    day     hour    minute
-*     0...0      0000    00000  00000   000000
-*    12bits     4bits     5bits    5bits     6bits
-*
-* And year is started with TIME32_YEAR_START,
-* in this case 1980.
-**/
+* TIME32 definition:
+*   A 32-bit unsigned int to store how many
+*   minutes passed since 1970.1.1. 
+*   It assumes that every month has 31 days.
+*/
 
 TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime);
 void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime);
