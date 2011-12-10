@@ -24,6 +24,7 @@ bool File_Exist (std::wstring Filepath);
 bool Directory_Exist (std::wstring Directorypath);
 bool Directory_Empty (std::wstring Directorypath);
 BY_HANDLE_FILE_INFORMATION File_Info (std::wstring Filepath); // didn't check whether file exists
+BY_HANDLE_FILE_INFORMATION File_Info_by_frn (unsigned __int64 frn, HANDLE hVol); // didn't check whether file exists
 
 typedef unsigned __int32 TIME32;
 #define TIME32_YEAR_START 1970
