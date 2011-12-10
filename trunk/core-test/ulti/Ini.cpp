@@ -18,19 +18,12 @@
 
 #include "Ini.h"
 #include "Log.h"
+#include "../core/File.h"
 #include <Windows.h>
-#include <Shlwapi.h>
-#pragma comment(lib,"Shlwapi.lib")
 using namespace std;
 
 #define _Ini_MaxSection 1024
 #define _Ini_MaxAllSections 6000
-
-
-bool File_Exist (wstring Filepath)
-{
-    return ::PathFileExistsW (Filepath.c_str()) && (!::PathIsDirectoryW (Filepath.c_str()));
-}
 
 vector<wstring> _Ini_SeprateBuff (LPWSTR lpszBuff)
 {
