@@ -75,12 +75,12 @@ typedef struct _OBJECT_ATTRIBUTES
 } OBJECT_ATTRIBUTES;
 
 #define InitializeObjectAttributes( p, n, a, r, s ) { \
-    (p)->Length = sizeof( OBJECT_ATTRIBUTES ); \
-    (p)->RootDirectory = r;                                  \
-    (p)->Attributes = a;                                       \
-    (p)->ObjectName = n;                                   \
-    (p)->SecurityDescriptor = s;                           \
-    (p)->SecurityQualityOfService = NULL;          \
+    (p)->Length = sizeof( OBJECT_ATTRIBUTES );        \
+    (p)->RootDirectory = r;                           \
+    (p)->Attributes = a;                              \
+    (p)->ObjectName = n;                              \
+    (p)->SecurityDescriptor = s;                      \
+    (p)->SecurityQualityOfService = NULL;             \
 }
 
 #define OBJ_CASE_INSENSITIVE 0x00000040L
@@ -91,8 +91,7 @@ inline BY_HANDLE_FILE_INFORMATION File_Info_by_frn (unsigned __int64 frn, HANDLE
 {
     static pNtCreateFile NtCreatefile = (pNtCreateFile) GetProcAddress (GetModuleHandle (L"ntdll.dll"), "NtCreateFile");
     HANDLE hFile;
-    ULONG fid[2] = { (ULONG) (frn & 0xffffffff), (ULONG) ( (frn >> 32) & 0xffffffff) };
-    UNICODE_STRING fidstr = {8, 8, (PWSTR) fid};
+    UNICODE_STRING fidstr = {8, 8, (PWSTR) frn};
     OBJECT_ATTRIBUTES oa = {0};
     InitializeObjectAttributes (&oa, &fidstr, OBJ_CASE_INSENSITIVE, hVol, NULL);
     ULONG iosb[2];
