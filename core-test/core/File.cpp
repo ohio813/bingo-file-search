@@ -45,6 +45,7 @@ inline BY_HANDLE_FILE_INFORMATION File_Info (std::wstring Filepath)
 }
 #pragma region File_Info_by_frn
 /* Use Native API to get file handle straightly through frn, and get file information */
+/* Ref: http://www.ragestorm.net/blogs/?p=186 */
 typedef ULONG (__stdcall *pNtCreateFile) (
     PHANDLE FileHandle,
     ULONG DesiredAccess,
@@ -91,7 +92,8 @@ inline BY_HANDLE_FILE_INFORMATION File_Info_by_frn (unsigned __int64 frn, HANDLE
 {
     static pNtCreateFile NtCreatefile = (pNtCreateFile) GetProcAddress (GetModuleHandle (L"ntdll.dll"), "NtCreateFile");
     HANDLE hFile;
-    UNICODE_STRING fidstr = {8, 8, (PWSTR) frn};
+	ULONG fid[2] = { (ULONG) (frn & 0xffffffff), (ULONG) ( (frn >> 32) & 0xffffffff) };
+    UNICODE_STRING fidstr = {8, 8, (PWSTR) fid};
     OBJECT_ATTRIBUTES oa = {0};
     InitializeObjectAttributes (&oa, &fidstr, OBJ_CASE_INSENSITIVE, hVol, NULL);
     ULONG iosb[2];
