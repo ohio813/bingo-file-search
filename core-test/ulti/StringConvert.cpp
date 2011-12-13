@@ -50,29 +50,29 @@ std::string Unicode2UTF (const wchar_t* buf)
     return std::string (utf8.begin(), utf8.end());
 }
 
-inline std::string _2string (std::wstring input)
+std::string _2string (std::wstring input)
 {
     return Unicode2ASCII (input.c_str());
 }
-inline std::string _utf2string (std::string utf8_input)
+std::string _utf2string (std::string utf8_input)
 {
     return Unicode2ASCII (UTF2Unicode (utf8_input.c_str()).c_str());
 }
 
-inline std::wstring _2wstring (std::string input)
+std::wstring _2wstring (std::string input)
 {
     return ASCII2Unicode (input.c_str());
 }
-inline std::wstring _utf2wstring (std::string utf8_input)
+std::wstring _utf2wstring (std::string utf8_input)
 {
     return UTF2Unicode (utf8_input.c_str());
 }
 
-inline std::string _2utf8 (std::wstring input)
+std::string _2utf8 (std::wstring input)
 {
     return Unicode2UTF (input.c_str());
 }
-inline std::string _2utf8 (std::string input)
+std::string _2utf8 (std::string input)
 {
     return Unicode2UTF (ASCII2Unicode (input.c_str()).c_str());
 }
