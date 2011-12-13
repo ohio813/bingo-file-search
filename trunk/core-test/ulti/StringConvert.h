@@ -65,42 +65,42 @@ namespace StringConvert
 	}
 }
 
-inline std::string _2string (std::wstring input);
-inline std::string _utf2string (std::string utf8_input);
+std::string _2string (std::wstring input);
+std::string _utf2string (std::string utf8_input);
 template<class T>
-inline std::string _2string (T num_input)
+std::string _2string (T num_input)
 {
     return StringConvert::num2string<T> (num_input);
 }
 
-inline std::wstring _2wstring (std::string input);
-inline std::wstring _utf2wstring (std::string utf8_input);
+std::wstring _2wstring (std::string input);
+std::wstring _utf2wstring (std::string utf8_input);
 template<class T>
-inline std::wstring _2wstring (T num_input)
+std::wstring _2wstring (T num_input)
 {
     return StringConvert::num2wstring<T> (num_input);
 }
 
-inline std::string _2utf8 (std::wstring input);
-inline std::string _2utf8 (std::string input);
+std::string _2utf8 (std::wstring input);
+std::string _2utf8 (std::string input);
 template<class T>
-inline std::string _2utf8 (T num_input)
+std::string _2utf8 (T num_input)
 {
     return _2utf8 (StringConvert::num2wstring<T> (num_input));
 }
 
 template<class T>
-inline T _2num (std::string input)
+T _2num (std::string input)
 {
     return StringConvert::string2num<T> (input);
 }
 template<class T>
-inline T _2num (std::wstring input)
+T _2num (std::wstring input)
 {
     return StringConvert::wstring2num<T> (input);
 }
 template<class T>
-inline T _utf2num (std::string utf8_input)
+T _utf2num (std::string utf8_input)
 {
     return StringConvert::wstring2num<T> (_utf2wstring (input));
 }

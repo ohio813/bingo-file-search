@@ -22,19 +22,19 @@
 #pragma comment(lib,"Shlwapi.lib")
 using namespace std;
 
-inline bool File_Exist (std::wstring Filepath)
+bool File_Exist (std::wstring Filepath)
 {
     return ::PathFileExistsW (Filepath.c_str()) && (!::PathIsDirectoryW (Filepath.c_str()));
 }
-inline bool Directory_Exist (std::wstring Directorypath)
+bool Directory_Exist (std::wstring Directorypath)
 {
     return ::PathIsDirectoryW (Directorypath.c_str());
 }
-inline bool Directory_Empty (std::wstring Directorypath)
+bool Directory_Empty (std::wstring Directorypath)
 {
     return ::PathIsDirectoryEmptyW (Directorypath.c_str());
 }
-inline BY_HANDLE_FILE_INFORMATION File_Info (std::wstring Filepath)
+BY_HANDLE_FILE_INFORMATION File_Info (std::wstring Filepath)
 {
     HANDLE hFile = CreateFileW ( (Filepath).c_str(), GENERIC_READ, FILE_SHARE_READ,
                                  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, NULL);
