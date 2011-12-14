@@ -105,8 +105,8 @@ void VolInfoMgr::listVol()
 
 VolHandleMgr::VolHandleMgr()
 {
-    for (int i = 0; i < 26; ++i)
-        m_hVols[i] = INVALID_HANDLE_VALUE;
+    // set every m_hVol as INVALID_HANDLE_VALUE, since INVALID_HANDLE_VALUE = 0xffffffff
+    memset (m_hVols, 0xff, 26 * 4);
 }
 VolHandleMgr::~VolHandleMgr()
 {
