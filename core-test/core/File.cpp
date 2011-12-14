@@ -20,17 +20,18 @@
 #include <Windows.h>
 #include <Shlwapi.h>
 #pragma comment(lib,"Shlwapi.lib")
+#pragma warning (disable : 4630)
 using namespace std;
 
-bool File_Exist (std::wstring Filepath)
+extern bool File_Exist (std::wstring Filepath)
 {
     return ::PathFileExistsW (Filepath.c_str()) && (!::PathIsDirectoryW (Filepath.c_str()));
 }
-bool Directory_Exist (std::wstring Directorypath)
+extern bool Directory_Exist (std::wstring Directorypath)
 {
     return ::PathIsDirectoryW (Directorypath.c_str());
 }
-bool Directory_Empty (std::wstring Directorypath)
+extern bool Directory_Empty (std::wstring Directorypath)
 {
     return ::PathIsDirectoryEmptyW (Directorypath.c_str());
 }
@@ -88,11 +89,11 @@ typedef struct _OBJECT_ATTRIBUTES
 #define FILE_NON_DIRECTORY_FILE 0x00000040
 #define FILE_OPEN_BY_FILE_ID 0x00002000
 #define FILE_OPEN 0x00000001
-inline BY_HANDLE_FILE_INFORMATION File_Info_by_frn (unsigned __int64 frn, HANDLE hVol)
+BY_HANDLE_FILE_INFORMATION File_Info_by_frn (unsigned __int64 frn, HANDLE hVol)
 {
     static pNtCreateFile NtCreatefile = (pNtCreateFile) GetProcAddress (GetModuleHandle (L"ntdll.dll"), "NtCreateFile");
     HANDLE hFile;
-	ULONG fid[2] = { (ULONG) (frn & 0xffffffff), (ULONG) ( (frn >> 32) & 0xffffffff) };
+    ULONG fid[2] = { (ULONG) (frn & 0xffffffff), (ULONG) ( (frn >> 32) & 0xffffffff) };
     UNICODE_STRING fidstr = {8, 8, (PWSTR) fid};
     OBJECT_ATTRIBUTES oa = {0};
     InitializeObjectAttributes (&oa, &fidstr, OBJ_CASE_INSENSITIVE, hVol, NULL);
@@ -106,7 +107,7 @@ inline BY_HANDLE_FILE_INFORMATION File_Info_by_frn (unsigned __int64 frn, HANDLE
 }
 #pragma endregion
 
-__forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime)
+extern TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime)
 {
     TIME32 time32;
     time32 = (sysTime.wYear - TIME32_YEAR_START) * 12;
@@ -116,7 +117,7 @@ __forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime)
     time32 += sysTime.wMinute;
     return time32;
 }
-__forceinline void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime)
+extern void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime)
 {
     sysTime.wMinute = time32 % 60;
     time32 /= 60;
