@@ -1,24 +1,25 @@
 /**
-*	Copyright (C) 2011  Xu Cheng, Yang Zhengyu ,Zuo Zhiheng
+*   Copyright (C) 2011  Xu Cheng, Yang Zhengyu ,Zuo Zhiheng
 *
-*	This program is free software: you can redistribute it and/or modify
-*	it under the terms of the GNU General Public License as published by
-*	the Free Software Foundation, either version 3 of the License, or
-*	(at your option) any later version.
-*	
-*	This program is distributed in the hope that it will be useful,
-*	but WITHOUT ANY WARRANTY; without even the implied warranty of
-*	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*	GNU General Public License for more details.
-*	
-*	You should have received a copy of the GNU General Public License
-*	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///:StringConvert.cpp
 
 #include "StringConvert.h"
 #include <vector>
 #include <Windows.h>
+#pragma warning (disable : 4630)
 using namespace std;
 
 std::wstring ASCII2Unicode (const char* buf)
@@ -50,29 +51,29 @@ std::string Unicode2UTF (const wchar_t* buf)
     return std::string (utf8.begin(), utf8.end());
 }
 
-std::string _2string (std::wstring input)
+extern std::string _2string (std::wstring input)
 {
     return Unicode2ASCII (input.c_str());
 }
-std::string _utf2string (std::string utf8_input)
+extern std::string _utf2string (std::string utf8_input)
 {
     return Unicode2ASCII (UTF2Unicode (utf8_input.c_str()).c_str());
 }
 
-std::wstring _2wstring (std::string input)
+extern std::wstring _2wstring (std::string input)
 {
     return ASCII2Unicode (input.c_str());
 }
-std::wstring _utf2wstring (std::string utf8_input)
+extern std::wstring _utf2wstring (std::string utf8_input)
 {
     return UTF2Unicode (utf8_input.c_str());
 }
 
-std::string _2utf8 (std::wstring input)
+extern std::string _2utf8 (std::wstring input)
 {
     return Unicode2UTF (input.c_str());
 }
-std::string _2utf8 (std::string input)
+extern std::string _2utf8 (std::string input)
 {
     return Unicode2UTF (ASCII2Unicode (input.c_str()).c_str());
 }
