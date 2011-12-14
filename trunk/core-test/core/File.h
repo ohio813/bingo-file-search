@@ -20,9 +20,9 @@
 #include <string>
 #include <Windows.h>
 
-bool File_Exist (std::wstring Filepath);
-bool Directory_Exist (std::wstring Directorypath);
-bool Directory_Empty (std::wstring Directorypath);
+inline bool File_Exist (std::wstring Filepath);
+inline bool Directory_Exist (std::wstring Directorypath);
+inline bool Directory_Empty (std::wstring Directorypath);
 BY_HANDLE_FILE_INFORMATION File_Info (std::wstring Filepath); // didn't check whether file exists
 BY_HANDLE_FILE_INFORMATION File_Info_by_frn (unsigned __int64 frn, HANDLE hVol); // didn't check whether file exists
 
@@ -35,7 +35,7 @@ typedef unsigned __int32 TIME32;
 *   It assumes that every month has 31 days.
 */
 
-TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime);
-void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime);
+__forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime);
+__forceinline void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime);
 #endif
 ///:~
