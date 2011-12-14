@@ -48,6 +48,7 @@ void Log::v (std::wstring log)
     locale::global (loc);
     ofile << L"verbose|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
           << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
+    ofile.flush();
     ofile.close();
 }
 void Log::w (std::wstring log)
@@ -62,6 +63,7 @@ void Log::w (std::wstring log)
     locale::global (loc);
     ofile << L"warning|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
           << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
+	ofile.flush();
     ofile.close();
 }
 void Log::e (std::wstring log)
@@ -76,6 +78,7 @@ void Log::e (std::wstring log)
     locale::global (loc);
     ofile << L"error|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
           << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
+	ofile.flush();
     ofile.close();
 }
 void Log::v (wchar_t * format, ...)
