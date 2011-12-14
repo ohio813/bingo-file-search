@@ -14,20 +14,20 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-///:VolumeLabel.h
-#ifndef VOLUMELABEL_H
-#define VOLUMELABEL_H
+///:VolumeLetter.h
+#ifndef VOLUMELETTER_H
+#define VOLUMELETTER_H
 
 #include <wchar.h>
 
-__forceinline wchar_t ChartoWCharLabel (char Label)
+__forceinline wchar_t ChartoWCharLetter (char Letter)
 {
-    return L'A' + (int) (Label - 'A');
+    return L'A' + (int) (Letter - 'A');
 }
 
-__forceinline char WChartoCharLabel (wchar_t Label)
+__forceinline char WChartoCharLetter (wchar_t Letter)
 {
-    return 'A' + (int) (Label - L'A');
+    return 'A' + (int) (Letter - L'A');
 }
 #endif
 ///:~
