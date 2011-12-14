@@ -14,15 +14,12 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-///:Data.h
-#ifndef DATA_H
-#define DATA_H
+///:Data.cpp
 
-#include "VolumeMgr.h"
+#include "Data.h"
 
-// link the global data.
-extern VolInfoMgr data_VolInfos;
-extern VolHandleMgr data_VolHandles;
+// Store the global data.
+VolInfoMgr data_VolInfos;
+VolHandleMgr data_VolHandles;
 
-#endif
 ///:~
