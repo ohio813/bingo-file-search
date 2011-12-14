@@ -169,7 +169,7 @@ void VolHandleMgr::_close (int i)
     {
         CloseHandle (m_hVols[i]);
         m_hVols[i] = INVALID_HANDLE_VALUE;
-        Log::v (L"Close handle of driver[%c:\\].", L'A' + i);
+        Log::v (L"Close handle of driver[%s:\\].", L'A' + i);
     }
 }
 ///:~
