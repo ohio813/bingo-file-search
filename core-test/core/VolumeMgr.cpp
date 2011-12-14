@@ -52,7 +52,7 @@ void VolInfoMgr::listVol()
                 _tmpNode.VolumeName[index] != L'\\')
         {
             ::SetLastError (ERROR_BAD_PATHNAME);
-            Log::e (L"Bad path name:[%s] for volume.", _tmpNode.VolumeName);
+            Log::w (L"Bad path name:[%s] for volume.", _tmpNode.VolumeName);
             continue;
         }
 
@@ -74,7 +74,7 @@ void VolInfoMgr::listVol()
             _tmpNode.isMounted = false;
         }
 
-        if (GetVolumeInformationW (_tmpNode.VolumeName, NULL, NULL, NULL, NULL, NULL, _tmpNode.FileSysType, MAX_PATH))
+        if (GetVolumeInformationW (_tmpNode.VolumeName, _tmpNode.VolumeLabel, MAX_PATH, NULL, NULL, NULL, _tmpNode.FileSysType, MAX_PATH))
             _tmpNode.isNTFS = (_wcsicmp (_tmpNode.FileSysType, L"NTFS") == 0);
         else
         {
@@ -103,4 +103,73 @@ void VolInfoMgr::listVol()
     _vol_find_handle = INVALID_HANDLE_VALUE;
 }
 
+VolHandleMgr::VolHandleMgr()
+{
+    for (int i = 0; i < 26; ++i)
+        m_hVols[i] = INVALID_HANDLE_VALUE;
+}
+VolHandleMgr::~VolHandleMgr()
+{
+    for (int i = 0; i < 26; ++i)
+        _close (i);
+}
+HANDLE VolHandleMgr::operator [] (char Letter)
+{
+    return m_hVols[Letter - 'A'];
+}
+HANDLE VolHandleMgr::operator [] (wchar_t Letter)
+{
+    return m_hVols[Letter - L'A'];
+}
+bool VolHandleMgr::open (char Letter)
+{
+    return _open (Letter - 'A');
+}
+bool VolHandleMgr::open (wchar_t Letter)
+{
+    return _open (Letter - L'A');
+}
+void VolHandleMgr::close (char Letter)
+{
+    _close (Letter - 'A');
+}
+void VolHandleMgr::close (wchar_t Letter)
+{
+    _close (Letter - L'A');
+}
+bool VolHandleMgr::isopen (char Letter)
+{
+    return ! (INVALID_HANDLE_VALUE == m_hVols[Letter - 'A']);
+}
+bool VolHandleMgr::isopen (wchar_t Letter)
+{
+    return ! (INVALID_HANDLE_VALUE == m_hVols[Letter - L'A']);
+}
+bool VolHandleMgr::_open (int i)
+{
+    wchar_t _path[] = L"\\\\.\\X:";
+    _path[4] = L'A' + i;
+    m_hVols[i] = CreateFileW (_path, GENERIC_READ | GENERIC_WRITE,  FILE_SHARE_READ | FILE_SHARE_WRITE,
+                              NULL, OPEN_EXISTING,  FILE_ATTRIBUTE_READONLY,  NULL);
+
+    if (INVALID_HANDLE_VALUE == m_hVols[i])
+    {
+        Log::e (L"Get handle of driver[%s] fails. error code:%d.", L'A' + i, ::GetLastError());
+        return false;
+    }
+    else
+    {
+        Log::v (L"Get handle of driver[%s] successes.", L'A' + i);
+        return true;
+    }
+}
+void VolHandleMgr::_close (int i)
+{
+    if (m_hVols[i] != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle (m_hVols[i]);
+        m_hVols[i] = INVALID_HANDLE_VALUE;
+        Log::v (L"Close handle of driver[%c:\\].", L'A' + i);
+    }
+}
 ///:~
