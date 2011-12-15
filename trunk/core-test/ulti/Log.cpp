@@ -38,6 +38,11 @@ void Log::setlogfile (std::wstring logfile)
 }
 void Log::v (std::wstring log)
 {
+#ifdef _DEBUG
+    log = L"[verbose]" + log + L"\n";
+    OutputDebugStringW (log.c_str());
+#else
+
     if (!_enable)
         return;
 
@@ -50,9 +55,15 @@ void Log::v (std::wstring log)
           << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
     ofile.flush();
     ofile.close();
+#endif
 }
 void Log::w (std::wstring log)
 {
+#ifdef _DEBUG
+    log = L"[warning]" + log + L"\n";
+    OutputDebugStringW (log.c_str());
+#else
+
     if (!_enable)
         return;
 
@@ -63,11 +74,17 @@ void Log::w (std::wstring log)
     locale::global (loc);
     ofile << L"warning|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
           << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
-	ofile.flush();
+    ofile.flush();
     ofile.close();
+#endif
 }
 void Log::e (std::wstring log)
 {
+#ifdef _DEBUG
+    log = L"[error]" + log + L"\n";
+    OutputDebugStringW (log.c_str());
+#else
+
     if (!_enable)
         return;
 
@@ -78,8 +95,9 @@ void Log::e (std::wstring log)
     locale::global (loc);
     ofile << L"error|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
           << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
-	ofile.flush();
+    ofile.flush();
     ofile.close();
+#endif
 }
 void Log::v (wchar_t * format, ...)
 {
