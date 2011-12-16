@@ -154,12 +154,12 @@ bool VolHandleMgr::_open (int i)
 
     if (INVALID_HANDLE_VALUE == m_hVols[i])
     {
-        Log::e (L"Get handle of driver[%s] fails. error code:%d.", L'A' + i, ::GetLastError());
+        Log::e (L"Get handle of driver[%c:\\] fails. error code:%d.", L'A' + i, ::GetLastError());
         return false;
     }
     else
     {
-        Log::v (L"Get handle of driver[%s] successes.", L'A' + i);
+        Log::v (L"Get handle of driver[%c:\\] successes.", L'A' + i);
         return true;
     }
 }
@@ -169,7 +169,7 @@ void VolHandleMgr::_close (int i)
     {
         CloseHandle (m_hVols[i]);
         m_hVols[i] = INVALID_HANDLE_VALUE;
-        Log::v (L"Close handle of driver[%s:\\].", L'A' + i);
+        Log::v (L"Close handle of driver[%c:\\].", L'A' + i);
     }
 }
 ///:~

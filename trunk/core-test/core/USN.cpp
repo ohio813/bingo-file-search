@@ -39,7 +39,7 @@ void VolUSN::StartUp()
 {
     if (QueryUSN())
     {
-        Log::v (L"Found exist USN journal of driver[%s:\\].", m_Path);
+        Log::v (L"Found exist USN journal of driver[%c:\\].", m_Path);
         /*
         read old usn
         if db not exist goto NewStart
@@ -51,13 +51,13 @@ void VolUSN::StartUp()
     else
     {
 NewStart:
-        Log::v (L"Start a new USN journal of driver[%s:\\].", m_Path);
+        Log::v (L"Start a new USN journal of driver[%c:\\].", m_Path);
 
         if (CreateUSN())
-            Log::v (L"Create USN journal of driver[%s:\\] successes.", m_Path);
+            Log::v (L"Create USN journal of driver[%c:\\] successes.", m_Path);
         else
         {
-            Log::e (L"Create USN journal of driver[%s:\\] fails. error code:%d.", m_Path, ::GetLastError());
+            Log::e (L"Create USN journal of driver[%c:\\] fails. error code:%d.", m_Path, ::GetLastError());
             synchronized (m_isActive_Mutex)
             {
                 m_isActive = false;
@@ -66,10 +66,10 @@ NewStart:
         }
 
         if (QueryUSN())
-            Log::v (L"Query USN journal of driver[%s:\\] successes.", m_Path);
+            Log::v (L"Query USN journal of driver[%c:\\] successes.", m_Path);
         else
         {
-            Log::e (L"Query USN journal of driver[%s:\\] fails. error code:%d.", m_Path, ::GetLastError());
+            Log::e (L"Query USN journal of driver[%c:\\] fails. error code:%d.", m_Path, ::GetLastError());
             synchronized (m_isActive_Mutex)
             {
                 m_isActive = false;
