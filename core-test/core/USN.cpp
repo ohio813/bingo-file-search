@@ -19,8 +19,8 @@
 #include "USN.h"
 #include "Data.h"
 #include <string>
-#include "../ulti/StringConvert.h"
-#include "../ulti/Log.h"
+#include "../util/StringConvert.h"
+#include "../util/Log.h"
 using namespace std;
 
 #define ENUM_BUF_LEN 32768 + sizeof(USN) //32K Buffer
