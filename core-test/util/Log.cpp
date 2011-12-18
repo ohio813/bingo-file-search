@@ -19,6 +19,7 @@
 #include <stdarg.h>
 #include <fstream>
 #include <Windows.h>
+#include <assert.h>
 using namespace std;
 
 bool Log::_enable = false;
@@ -41,6 +42,7 @@ void Log::v (std::wstring log)
 #ifdef _DEBUG
     log = L"[verbose]" + log + L"\n";
     OutputDebugStringW (log.c_str());
+    assert (false && log.c_str());
 #else
 
     if (!_enable)
