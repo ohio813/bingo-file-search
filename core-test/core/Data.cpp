@@ -17,20 +17,26 @@
 ///:Data.cpp
 
 #include "Data.h"
+#include "NTFS.h"
 
 // Store the global data.
+MemoryPool *data_MemPool;
 VolInfoMgr *data_VolInfos;
 VolHandleMgr *data_VolHandles;
 
 void InitGlobalData()
 {
+    data_MemPool = new MemoryPool();
     data_VolInfos = new VolInfoMgr();
     data_VolHandles = new VolHandleMgr();
+    NTFS::data_volNTFSCache = new NTFS::VolNTFSCache();
 }
 void DestroyGlobalData()
 {
+    delete data_MemPool;
     delete data_VolInfos;
     delete data_VolHandles;
+    delete NTFS::data_volNTFSCache;
 }
 
 ///:~

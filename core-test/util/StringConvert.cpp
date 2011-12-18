@@ -17,38 +17,56 @@
 ///:StringConvert.cpp
 
 #include "StringConvert.h"
-#include <vector>
+//#include <vector>
 #include <Windows.h>
+#include "../core/Memory.h"
+#include "../core/Data.h"
 #pragma warning (disable : 4630)
 using namespace std;
 
 std::wstring ASCII2Unicode (const char* buf)
 {
     int len = MultiByteToWideChar (CP_ACP, 0, buf, -1, NULL, 0);
-    std::vector<wchar_t> unicode (len);
+    //std::vector<wchar_t> unicode (len);
+    wchar_t *unicode = (wchar_t *) data_MemPool->malloc (len * sizeof (wchar_t));
     MultiByteToWideChar (CP_ACP, 0, buf, -1, &unicode[0], len);
-    return std::wstring (unicode.begin(), unicode.end());
+    //return std::wstring (unicode.begin(), unicode.end());
+    std::wstring ret (unicode, unicode + len * sizeof (wchar_t));
+    data_MemPool->free (unicode);
+    return ret;
 }
 std::string Unicode2ASCII (const wchar_t* buf)
 {
     int len = WideCharToMultiByte (CP_ACP, 0, buf, -1, NULL, 0, NULL, NULL);
-    std::vector<char> ascii (len);
+    //std::vector<char> ascii (len);
+    char* ascii = (char*) data_MemPool->malloc (len * sizeof (char));
     WideCharToMultiByte (CP_ACP, 0, buf, -1, &ascii[0], len, NULL, NULL);
-    return std::string (ascii.begin(), ascii.end());
+    //return std::string (ascii.begin(), ascii.end());
+    std::string ret (ascii, ascii + len * sizeof (char));
+    data_MemPool->free (ascii);
+    return ret;
 }
 std::wstring UTF2Unicode (const char* buf)
 {
     int len = MultiByteToWideChar (CP_UTF8, 0, buf, -1, NULL, 0);
-    std::vector<wchar_t> unicode (len);
+    //std::vector<wchar_t> unicode (len);
+    wchar_t *unicode = (wchar_t *) data_MemPool->malloc (len * sizeof (wchar_t));
     MultiByteToWideChar (CP_UTF8, 0, buf, -1, &unicode[0], len);
-    return std::wstring (unicode.begin(), unicode.end());
+    //return std::wstring (unicode.begin(), unicode.end());
+    std::wstring ret (unicode, unicode + len * sizeof (wchar_t));
+    data_MemPool->free (unicode);
+    return ret;
 }
 std::string Unicode2UTF (const wchar_t* buf)
 {
     int len = WideCharToMultiByte (CP_UTF8, 0, buf, -1, NULL, 0, NULL, NULL);
-    std::vector<char> utf8 (len);
+    //std::vector<char> utf8 (len);
+    char* utf8 = (char*) data_MemPool->malloc (len * sizeof (char));
     WideCharToMultiByte (CP_UTF8, 0, buf, -1, &utf8[0], len, NULL, NULL);
-    return std::string (utf8.begin(), utf8.end());
+    //return std::string (utf8.begin(), utf8.end());
+    std::string ret (utf8, utf8 + len * sizeof (char));
+    data_MemPool->free (utf8);
+    return ret;
 }
 
 extern std::string _2string (std::wstring input)

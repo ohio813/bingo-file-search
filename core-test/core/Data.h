@@ -19,8 +19,10 @@
 #define DATA_H
 
 #include "VolumeMgr.h"
+#include "Memory.h"
 
 // link the global data.
+extern MemoryPool *data_MemPool;
 extern VolInfoMgr *data_VolInfos;
 extern VolHandleMgr *data_VolHandles;
 

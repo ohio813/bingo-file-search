@@ -191,7 +191,7 @@ MemoryPool::~MemoryPool()
 {
     FreeAllAllocatedMemory();
 
-    if (m_objectCount == 0)
+    if (m_objectCount != 0)
         Log::w (L"You have not freed all allocated objects of MemoryPool:0x%016I64x ", (__int64) this);
 }
 void* MemoryPool::malloc (size_t Size)
