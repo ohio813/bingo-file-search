@@ -42,7 +42,6 @@ void Log::v (std::wstring log)
 #ifdef _DEBUG
     log = L"[verbose]" + log + L"\n";
     OutputDebugStringW (log.c_str());
-    assert (false && log.c_str());
 #else
 
     if (!_enable)
@@ -84,7 +83,8 @@ void Log::e (std::wstring log)
 {
 #ifdef _DEBUG
     log = L"[error]" + log + L"\n";
-    OutputDebugStringW (log.c_str());
+	OutputDebugStringW (log.c_str());
+	assert (false && log.c_str());
 #else
 
     if (!_enable)
