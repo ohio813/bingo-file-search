@@ -21,8 +21,12 @@
 #include "VolumeMgr.h"
 
 // link the global data.
-extern VolInfoMgr data_VolInfos;
-extern VolHandleMgr data_VolHandles;
+extern VolInfoMgr *data_VolInfos;
+extern VolHandleMgr *data_VolHandles;
+
+// global data associated function
+void InitGlobalData();        // inital data
+void DestroyGlobalData(); // free data
 
 #endif
 ///:~

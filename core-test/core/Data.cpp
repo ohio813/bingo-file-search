@@ -19,7 +19,18 @@
 #include "Data.h"
 
 // Store the global data.
-VolInfoMgr data_VolInfos;
-VolHandleMgr data_VolHandles;
+VolInfoMgr *data_VolInfos;
+VolHandleMgr *data_VolHandles;
+
+void InitGlobalData()
+{
+    data_VolInfos = new VolInfoMgr();
+    data_VolHandles = new VolHandleMgr();
+}
+void DestroyGlobalData()
+{
+    delete data_VolInfos;
+    delete data_VolHandles;
+}
 
 ///:~

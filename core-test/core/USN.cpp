@@ -33,7 +33,7 @@ VolUSN::VolUSN (wchar_t Path)
         m_isActive = false;
     }
     m_Path = Path;
-    m_hVol = data_VolHandles[m_Path];
+    m_hVol = (*data_VolHandles)[m_Path];
 }
 void VolUSN::StartUp()
 {
