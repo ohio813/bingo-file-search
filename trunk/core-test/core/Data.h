@@ -25,7 +25,7 @@ extern VolInfoMgr *data_VolInfos;
 extern VolHandleMgr *data_VolHandles;
 
 // global data associated function
-void InitGlobalData();        // inital data
+void InitGlobalData();        // initial data
 void DestroyGlobalData(); // free data
 
 #endif
