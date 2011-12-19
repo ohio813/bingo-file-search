@@ -165,7 +165,7 @@ void VolUSN::EnumUSN()
             UsnRecord = (PUSN_RECORD) ( ( (char*) UsnRecord) + recordLen);
         }
 
-        med.StartFileReferenceNumber = * (USN *) &EnumBuff;
+        med.StartFileReferenceNumber = * (USN *) EnumBuff;
     }
 
     data_MemPool->free (EnumBuff);
@@ -221,7 +221,7 @@ void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
             UsnRecord = (PUSN_RECORD) ( ( (char*) UsnRecord) + recordLen);
         }
 
-        rujd.StartUsn = * (USN *) &ReadBuff;
+        rujd.StartUsn = * (USN *) ReadBuff;
         m_UsnInfo.NextUsn = rujd.StartUsn;
 
         if (Monitor)
