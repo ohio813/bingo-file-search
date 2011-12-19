@@ -117,6 +117,13 @@ extern TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime)
     time32 += sysTime.wMinute;
     return time32;
 }
+extern TIME32 FILETIMEtoTIME32 (const FILETIME &fileTime)
+{
+    FILETIME localFileTime;
+    FileTimeToLocalFileTime (&fileTime, &localFileTime);
+    SYSTEMTIME sysTime;
+    return SYSTIMEtoTIME32 (sysTime);
+}
 extern void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime)
 {
     sysTime.wMinute = time32 % 60;

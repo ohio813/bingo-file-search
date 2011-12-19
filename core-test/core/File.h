@@ -31,11 +31,12 @@ typedef unsigned __int32 TIME32;
 /**
 * TIME32 definition:
 *   A 32-bit unsigned int to store how many
-*   minutes passed since 1970.1.1. 
+*   minutes passed since 1970.1.1.
 *   It assumes that every month has 31 days.
 */
 
 __forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime);
+__forceinline TIME32 FILETIMEtoTIME32 (const FILETIME &fileTime);
 __forceinline void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime);
 #endif
 ///:~
