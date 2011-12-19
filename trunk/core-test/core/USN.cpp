@@ -18,6 +18,7 @@
 
 #include "USN.h"
 #include "Data.h"
+#include "Memory.h"
 #include <string>
 #include "../util/StringConvert.h"
 #include "../util/Log.h"
@@ -33,7 +34,7 @@ VolUSN::VolUSN (wchar_t Path)
         m_isActive = false;
     }
     m_Path = Path;
-    m_hVol = (*data_VolHandles)[m_Path];
+    m_hVol = (*data_VolHandles) [m_Path];
 }
 void VolUSN::StartUp()
 {
@@ -142,7 +143,7 @@ void VolUSN::EnumUSN()
     med.StartFileReferenceNumber = 0;
     med.LowUsn = m_UsnInfo.FirstUsn;
     med.HighUsn = m_UsnInfo.NextUsn;
-    char EnumBuff[ENUM_BUF_LEN];
+    char* EnumBuff = (char *) data_MemPool->malloc (ENUM_BUF_LEN);
     DWORD usnDataSize;
     PUSN_RECORD UsnRecord;
 
@@ -166,6 +167,8 @@ void VolUSN::EnumUSN()
 
         med.StartFileReferenceNumber = * (USN *) &EnumBuff;
     }
+
+    data_MemPool->free (EnumBuff);
 }
 void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
 {
@@ -176,7 +179,7 @@ void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
     rujd.Timeout = 0;
     rujd.BytesToWaitFor = 0;
     rujd.UsnJournalID = m_UsnInfo.UsnJournalID;
-    char ReadBuff[READ_BUF_LEN];
+    char* ReadBuff = (char *) data_MemPool->malloc (READ_BUF_LEN);
     DWORD usnDataSize;
     PUSN_RECORD UsnRecord;
 
@@ -226,16 +229,24 @@ void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
             synchronized (m_isActive_Mutex)
             {
                 if (!m_isActive)
+                {
+                    data_MemPool->free (ReadBuff);
                     return;
+                }
             }
             Sleep (1500);
         }
         else
         {
             if (dwRetBytes == 0)
+            {
+                data_MemPool->free (ReadBuff);
                 return;
+            }
         }
     }
+
+    data_MemPool->free (ReadBuff);
 }
 
 DWORD WINAPI ReadUSNThread (LPVOID param)
