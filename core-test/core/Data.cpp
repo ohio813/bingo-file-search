@@ -29,14 +29,14 @@ void InitGlobalData()
     data_MemPool = new MemoryPool();
     data_VolInfos = new VolInfoMgr();
     data_VolHandles = new VolHandleMgr();
-    NTFS::data_volNTFSCache = new NTFS::VolNTFSCache();
+    NTFS::data_volNTFSInfoCache = new NTFS::VolNTFSInfoCache();
 }
 void DestroyGlobalData()
 {
-    delete data_MemPool;
+    delete NTFS::data_volNTFSInfoCache;
     delete data_VolInfos;
     delete data_VolHandles;
-    delete NTFS::data_volNTFSCache;
+    delete data_MemPool;
 }
 
 ///:~

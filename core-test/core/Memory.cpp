@@ -475,20 +475,34 @@ void MemoryPool::FreeAllAllocatedMemory()
 }
 MemoryPool::BlockPtr MemoryPool::FindBlockSuitableToHoldMemory (const std::size_t &Size)
 {
-    for (unsigned int i = 0; i < m_blockCount; ++i)
+    for (unsigned int i = 0; i < m_blockCount;)
     {
         if (m_pCurBlock == m_memBlocks.end())
             m_pCurBlock = m_memBlocks.begin();
 
-        if (m_pCurBlock->DataSize >= Size && m_pCurBlock->UsedSize == 0)
-            return m_pCurBlock;
+        if (m_pCurBlock->UsedSize == 0)
+        {
+            if (m_pCurBlock->DataSize >= Size)
+                return m_pCurBlock;
+            else
+            {
+                unsigned int BlocksToSkip = mp_NeedBlocks (m_pCurBlock->DataSize);
 
-        unsigned int BlocksToSkip = mp_NeedBlocks (m_pCurBlock->UsedSize);
+                for (unsigned int j = 0; j < BlocksToSkip; ++j)
+                    m_pCurBlock++;
 
-        if (BlocksToSkip == 0) BlocksToSkip = 1;
+                i += BlocksToSkip;
+            }
+        }
+        else
+        {
+            unsigned int BlocksToSkip = mp_NeedBlocks (m_pCurBlock->UsedSize);
 
-        for (unsigned int j = 0; j < BlocksToSkip; ++j)
-            m_pCurBlock++;
+            for (unsigned int j = 0; j < BlocksToSkip; ++j)
+                m_pCurBlock++;
+
+            i += BlocksToSkip;
+        }
     }
 
     return m_memBlocks.end();
@@ -523,10 +537,7 @@ void MemoryPool::LinkBlocksToData (unsigned int BlockCount, unsigned char *ptrNe
     firstBlockNode.Data = &ptrNewMemBlock[MemOffSet];
     firstBlockNode.DataSize = BlockCount * mp_SingleBlockSize;
     MemOffSet += mp_SingleBlockSize;
-    m_memBlocks.push_back (firstBlockNode);
-
-    if (m_memBlocks.size() == 1)
-        m_pCurBlock = m_memBlocks.begin();
+    m_pCurBlock = m_memBlocks.insert (m_memBlocks.end(), firstBlockNode);//push_back
 
     //set other nodes
     for (unsigned int i = 1; i < BlockCount; ++i)
