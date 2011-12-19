@@ -103,19 +103,19 @@ void Log::e (std::wstring log)
 }
 void Log::v (wchar_t * format, ...)
 {
-    wchar_t log[512] = {0};
-    va_list args;
-    va_start (args, format);
-    swprintf (log, format, args);
-    va_end (args);
-    v (wstring (log));
+	wchar_t log[512] = {0};
+	va_list args;
+	va_start (args, format);
+	_vswprintf (log, format, args);
+	va_end (args);
+	v (wstring (log));
 }
 void Log::w (wchar_t * format, ...)
 {
     wchar_t log[512] = {0};
     va_list args;
     va_start (args,  format);
-    swprintf (log, format, args);
+    _vswprintf (log, format, args);
     va_end (args);
     w (wstring (log));
 }
@@ -124,7 +124,7 @@ void Log::e (wchar_t * format, ...)
     wchar_t log[512] = {0};
     va_list args;
     va_start (args,  format);
-    swprintf (log, format, args);
+    _vswprintf (log, format, args);
     va_end (args);
     e (wstring (log));
 }
