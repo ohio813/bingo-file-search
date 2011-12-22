@@ -336,8 +336,8 @@ namespace NTFS
 {
     typedef struct
     {
-        int BytesPerFileRecordSegment;
-        int BytesPerCluster;
+        __int16 BytesPerFileRecordSegment;
+        __int16 BytesPerCluster;
     } VolNTFSInfoNode;
 
     class VolNTFSInfoCache
