@@ -44,7 +44,7 @@ void VolUSN::StartUp()
         /*
         read old usn
         if db not exist goto NewStart
-        if db.oldusn != m_UsnInfo.UsnJournalID (DeleteUSN();goto NewStart)
+        if db.oldusn != m_UsnInfo.UsnJournalID (/*DeleteUSN();*/goto NewStart)
         ReadUSN(lastNextUSN,false)
         CreateThread
         */
