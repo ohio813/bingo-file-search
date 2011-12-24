@@ -41,13 +41,13 @@ void VolUSN::StartUp()
     if (QueryUSN())
     {
         Log::v (L"Found exist USN journal of driver[%c:\\].", m_Path);
-        /*
-        read old usn
-        if db not exist goto NewStart
-        if db.oldusn != m_UsnInfo.UsnJournalID (/*DeleteUSN();*/goto NewStart)
-        ReadUSN(lastNextUSN,false)
-        CreateThread
-        */
+        //
+        //read old usn
+        //if db not exist goto NewStart
+        //if db.oldusn != m_UsnInfo.UsnJournalID (/*DeleteUSN();*/goto NewStart)
+        //ReadUSN(lastNextUSN,false)
+        //CreateThread
+        //
     }
     else
     {
