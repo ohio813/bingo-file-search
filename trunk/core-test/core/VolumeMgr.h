@@ -23,21 +23,24 @@
 #include <set>
 #include <map>
 
+#pragma pack(push,1)
 typedef struct VolInfoNode
 {
     wchar_t VolumeName[MAX_PATH];
+    // volume unique guid name, in form of "\\?\Volume{GUID}\"
     wchar_t DeviceName[MAX_PATH];
-    bool isLocalDisk;
-    bool isMounted;
-    wchar_t Path[5];
+    // an MS-DOS device name, such as: "\Device\HarddiskVolume1"
     wchar_t VolumeLabel[MAX_PATH];
-    bool isNTFS;
-    wchar_t FileSysType[MAX_PATH];
+    wchar_t Path; // driver letter as 'C' for 'C:\'
+    wchar_t FileSysType[10]; // file system such as: NTFS,FAT32,etc
+    bool isLocalDisk: 2;
+    bool isMounted: 2;
+    bool isNTFS: 4;
     unsigned __int64 totalspace;
     unsigned __int64 freespace;
     bool operator < (const VolInfoNode n) const
     {
-        int tmp = wcscmp (this->Path, n.Path);
+        int tmp = this->Path - n.Path;
 
         if (tmp == 0)
             return wcscmp (this->VolumeName, n.VolumeName) < 0 ;
@@ -45,6 +48,7 @@ typedef struct VolInfoNode
             return tmp < 0;
     }
 } VolInfoNode;
+#pragma pack(pop)
 
 class VolInfoMgr
 {

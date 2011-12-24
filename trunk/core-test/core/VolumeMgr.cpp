@@ -52,6 +52,7 @@ void VolInfoMgr::listVol()
                 _tmpNode.VolumeName[index] != L'\\')
         {
             ::SetLastError (ERROR_BAD_PATHNAME);
+            _tmpNode.VolumeName[index] = L'\0';
             Log::w (L"Bad path name:[%s] for volume.", _tmpNode.VolumeName);
             continue;
         }
@@ -64,17 +65,21 @@ void VolInfoMgr::listVol()
         _tmpNode.VolumeName[index] = L'\\';
         _tmpNode.isLocalDisk = (GetDriveTypeW (_tmpNode.VolumeName) == DRIVE_FIXED);
         DWORD CharCount = 5;
+        wchar_t _Path[5];
 
-        if (GetVolumePathNamesForVolumeNameW (_tmpNode.VolumeName, _tmpNode.Path, CharCount, &CharCount)
+        if (GetVolumePathNamesForVolumeNameW (_tmpNode.VolumeName, _Path, CharCount, &CharCount)
                 && CharCount > 1)
+        {
+            _tmpNode.Path = (_Path[0] <= L'Z' ? _Path[0] : _Path[0] - 32/*L'a'-L'A'*/);
             _tmpNode.isMounted = true;
+        }
         else
         {
-            _tmpNode.Path[0] = L'\0';
+            _tmpNode.Path = 0;
             _tmpNode.isMounted = false;
         }
 
-        if (GetVolumeInformationW (_tmpNode.VolumeName, _tmpNode.VolumeLabel, MAX_PATH, NULL, NULL, NULL, _tmpNode.FileSysType, MAX_PATH))
+        if (GetVolumeInformationW (_tmpNode.VolumeName, _tmpNode.VolumeLabel, MAX_PATH, NULL, NULL, NULL, _tmpNode.FileSysType, 10))
             _tmpNode.isNTFS = (_wcsicmp (_tmpNode.FileSysType, L"NTFS") == 0);
         else
         {
