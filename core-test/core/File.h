@@ -38,5 +38,15 @@ typedef unsigned __int32 TIME32;
 __forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime);
 __forceinline TIME32 FILETIMEtoTIME32 (const FILETIME &fileTime);
 __forceinline void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime);
+
+__forceinline unsigned __int32 FileSizeinKB (unsigned __int64 size)
+{
+    unsigned __int32 out = unsigned __int32 (size >> 10);
+
+    if (size % 1024 != 0)
+        out++;
+
+    return out;
+}
 #endif
 ///:~
