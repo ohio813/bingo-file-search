@@ -14,32 +14,8 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-///:Data.cpp
+///:CoreMgr.cpp
 
-#include "Data.h"
-#include "NTFS.h"
-
-// Store the global data.
-MemoryPool *data_MemPool;
-VolInfoMgr *data_VolInfos;
-VolHandleMgr *data_VolHandles;
-Language *uidata_Lang;
-
-void InitGlobalData()
-{
-    data_MemPool = new MemoryPool();
-    uidata_Lang = new Language();
-    data_VolInfos = new VolInfoMgr();
-    data_VolHandles = new VolHandleMgr();
-    NTFS::data_volNTFSInfoCache = new NTFS::VolNTFSInfoCache();
-}
-void DestroyGlobalData()
-{
-    delete NTFS::data_volNTFSInfoCache;
-    delete data_VolInfos;
-    delete data_VolHandles;
-    delete uidata_Lang;
-    delete data_MemPool;
-}
+#include "CoreMgr.h"
 
 ///:~

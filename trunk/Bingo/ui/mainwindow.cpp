@@ -17,29 +17,34 @@
 ///:mainwindow.cpp
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "Language.h"
 #include "util\Log.h"
+#include "core\Data.h"
 
 MainWindow::MainWindow (QWidget *parent) :
     QMainWindow (parent),
     ui (new Ui::MainWindow)
 {
     ui->setupUi (this);
+    //set language refresh
+    connect (uidata_Lang, SIGNAL (refreshLangRequest()), this, SLOT (languageRefresh()));
     //setup System Tray Icon
     trayIcon = new QSystemTrayIcon (this);
     trayIcon->setIcon (QIcon (":/image/logo.png"));
     trayIcon->show();
-    trayIcon->setToolTip (trUtf8 ("Bingo!"));
+    trayIcon->setToolTip (tr ("Bingo!"));
     trayIconMenu = new QMenu (this);
-    trayIconMenuActionRestore = new QAction (trUtf8 ("Restore"), this);
+    trayIconMenuActionRestore = new QAction (tr ("Restore"), this);
     connect (trayIconMenuActionRestore, SIGNAL (triggered()), this, SLOT (showNormal()));
     trayIconMenu->addAction (trayIconMenuActionRestore);
-    trayIconMenuActionQuit = new QAction (trUtf8 ("Quit"), this);
+    trayIconMenuActionQuit = new QAction (tr ("Quit"), this);
     connect (trayIconMenuActionQuit, SIGNAL (triggered()), qApp, SLOT (quit()));
     trayIconMenu->addAction (trayIconMenuActionQuit);
     trayIcon->setContextMenu (trayIconMenu);
     connect (trayIcon, SIGNAL (activated (QSystemTrayIcon::ActivationReason)), this,
              SLOT (onSystemTrayIconClicked (QSystemTrayIcon::ActivationReason)));
     QApplication::setQuitOnLastWindowClosed (false);
+    //connect to other instance of this app, to ensure there's only one instance running in Desktop.
     localServer = new QLocalServer (this);
     connect (localServer, SIGNAL (newConnection()), this, SLOT (newLocalSocketConnection()));
 
@@ -83,5 +88,12 @@ void MainWindow::newLocalSocketConnection()
 {
     this->setWindowState (Qt::WindowActive);
     this->showNormal();
+}
+
+void MainWindow::languageRefresh()
+{
+    trayIcon->setToolTip (tr ("Bingo!"));
+    trayIconMenuActionRestore->setText (tr ("Restore"));
+    trayIconMenuActionQuit->setText (tr ("Quit"));
 }
 ///:~
