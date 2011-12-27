@@ -22,7 +22,6 @@
 #include <vector>
 #include <string>
 
-inline bool File_Exist (std::wstring Filepath);
 bool Ini_WriteSection (std::wstring Filepath, std::wstring Section, std::wstring SectionValue, bool Create = true);
 bool Ini_WriteValue (std::wstring Filepath, std::wstring Section, std::wstring ValueName, std::wstring Value, bool Create = true);
 bool Ini_WriteStructValue (std::wstring Filepath, std::wstring Section, std::wstring ValueName, LPVOID Struct, UINT Size, bool Create = true);
