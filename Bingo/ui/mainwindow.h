@@ -35,11 +35,13 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow (QWidget *parent = 0);
     ~MainWindow();
-signals:
 public slots:
     //System Tray Icon
     void onSystemTrayIconClicked (QSystemTrayIcon::ActivationReason reason);
+    //connect to other instance of this app, to ensure there's only one instance running in Desktop.
     void newLocalSocketConnection();
+    //language refresh
+    void languageRefresh();
 private:
     Ui::MainWindow *ui;
     //System Tray Icon
@@ -47,6 +49,7 @@ private:
     QMenu *trayIconMenu;
     QAction *trayIconMenuActionRestore;
     QAction *trayIconMenuActionQuit;
+    //connect to other instance of this app, to ensure there's only one instance running in Desktop.
     QLocalServer *localServer;
 };
 

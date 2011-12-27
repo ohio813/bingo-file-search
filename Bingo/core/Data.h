@@ -20,11 +20,13 @@
 
 #include "VolumeMgr.h"
 #include "Memory.h"
+#include "ui/Language.h"
 
 // link the global data.
 extern MemoryPool *data_MemPool;
 extern VolInfoMgr *data_VolInfos;
 extern VolHandleMgr *data_VolHandles;
+extern Language *uidata_Lang;
 
 // global data associated function
 void InitGlobalData();        // initial data

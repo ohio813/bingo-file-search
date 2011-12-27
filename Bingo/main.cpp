@@ -24,6 +24,10 @@ int main (int argc, char *argv[])
 {
     //initial app
     QApplication a (argc, argv);
+    QTextCodec *utf8 = QTextCodec::codecForName ("utf-8");
+    QTextCodec::setCodecForTr (utf8);
+    QTextCodec::setCodecForLocale (utf8);
+    QTextCodec::setCodecForCStrings (utf8);
     //check is there another instance of this app
     QLocalSocket socket;
     socket.connectToServer ("Bingo-File-Search");
@@ -44,6 +48,7 @@ int main (int argc, char *argv[])
     //initial global data
     InitGlobalData();
     //initial main windows
+    uidata_Lang->loadLang();
     MainWindow w;
     w.show();
     int retCode = a.exec();
