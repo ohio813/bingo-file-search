@@ -20,16 +20,16 @@
 
 #include <QtCore>
 #include <QtGui>
-#include <map>
+#include <vector>
 
 class Language: public QObject
 {
     Q_OBJECT
 public:
     void loadLang();
-    QString getCurLang();
-    std::map<QString, QString> listAllLang();
-    void setCurLang (QString lang);
+    QLocale getCurLang();
+    std::vector<QLocale> listAllLang();
+    void setCurLang (QLocale lang);
 signals:
     void explains();
     void refreshLangRequest();

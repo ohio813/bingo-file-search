@@ -23,59 +23,60 @@ using namespace std;
 
 void Language::loadLang()
 {
-    wstring _defaultLang = Ini_ReadValue (L"lang/config.ini", L"Config", L"Default");
-    QString defaultLang;
+    wstring defaultLang = Ini_ReadValue (L"lang/config.ini", L"Config", L"Default");
+    QLocale defaultLocal;
 
-    if (_defaultLang == L"")
-        defaultLang = "lang/en.qm";
+    if (defaultLang == L"")
+        defaultLocal = QLocale::system();
     else
-        defaultLang = QString::fromStdWString (L"lang/" + _defaultLang);
+        defaultLocal = QLocale (QString::fromStdWString (defaultLang));
 
     QTranslator qtTranslator;
-    qtTranslator.load (defaultLang);
+
+    if (!qtTranslator.load (QString ("lang/bingo_%1.qm").arg (defaultLocal.name())))
+        qtTranslator.load (QString ("lang/bingo_%1.qm").arg (QLocale (QLocale::English).name()));
+
     qApp->installTranslator (&qtTranslator);
 }
 
-QString Language::getCurLang()
+QLocale Language::getCurLang()
 {
-    wstring _defaultLang = Ini_ReadValue (L"lang/config.ini", L"Config", L"Default");
-    QString defaultLang;
+    wstring defaultLang = Ini_ReadValue (L"lang/config.ini", L"Config", L"Default");
 
-    if (_defaultLang == L"")
-        defaultLang = "en.qm";
+    if (defaultLang == L"")
+    {
+        QLocale locale = QLocale::system();
+
+        if (QFile::exists (QString ("lang/bingo_%1.qm").arg (locale.name())))
+            return locale;
+        else
+            return QLocale (QLocale::English);
+    }
     else
-        defaultLang = QString::fromStdWString (_defaultLang);
-
-    return defaultLang;
+        return QLocale (QString::fromStdWString (defaultLang));
 }
 
-void Language::setCurLang (QString lang)
+void Language::setCurLang (QLocale lang)
 {
-    QString defaultLang = "lang/" + lang;
-
-    if (!QFile::exists (defaultLang))
+    if (!QFile::exists (QString ("lang/bingo_%1.qm").arg (lang.name())))
         return;
     else
-        Ini_WriteValue (L"lang/config.ini", L"Config", L"Default", lang.toStdWString());
+        Ini_WriteValue (L"lang/config.ini", L"Config", L"Default", lang.name().toStdWString());
 
     QTranslator qtTranslator;
-    qtTranslator.load (defaultLang);
+    qtTranslator.load (QString ("lang/bingo_%1.qm").arg (lang.name()));
     qApp->installTranslator (&qtTranslator);
     emit refreshLangRequest();
 }
 
-map<QString, QString> Language::listAllLang()
+vector<QLocale> Language::listAllLang()
 {
     vector<wstring> SectionValues;
-    map<QString, QString> ret;
+    vector<QLocale> ret;
     Ini_ReadSection (L"lang/config.ini", L"Lang", SectionValues);
 
     for (int i = 0; i < SectionValues.size(); ++i)
-    {
-        QString tmp = QString::fromStdWString (SectionValues[i]);
-        int n = tmp.indexOf (QRegExp ("\\="));
-        ret.insert (pair<QString, QString> (tmp.left (n), tmp.mid (n+1)));
-    }
+        ret.push_back (QLocale (QString::fromStdWString (SectionValues[i])));
 
     return ret;
 }
