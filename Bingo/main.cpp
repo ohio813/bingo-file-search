@@ -51,6 +51,7 @@ int main (int argc, char *argv[])
     uidata_Lang->loadLang();
     MainWindow w;
     w.show();
+    data_coreMgr->start();
     int retCode = a.exec();
     //destroy global data
     DestroyGlobalData();
