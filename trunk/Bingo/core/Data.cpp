@@ -20,6 +20,7 @@
 #include "NTFS.h"
 
 // Store the global data.
+CoreMgr *data_coreMgr;
 MemoryPool *data_MemPool;
 VolInfoMgr *data_VolInfos;
 VolHandleMgr *data_VolHandles;
@@ -32,9 +33,11 @@ void InitGlobalData()
     data_VolInfos = new VolInfoMgr();
     data_VolHandles = new VolHandleMgr();
     NTFS::data_volNTFSInfoCache = new NTFS::VolNTFSInfoCache();
+    data_coreMgr = new CoreMgr();
 }
 void DestroyGlobalData()
 {
+    delete data_coreMgr;
     delete NTFS::data_volNTFSInfoCache;
     delete data_VolInfos;
     delete data_VolHandles;

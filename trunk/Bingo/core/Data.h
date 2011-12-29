@@ -18,11 +18,13 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include "CoreMgr.h"
 #include "VolumeMgr.h"
 #include "Memory.h"
 #include "ui/Language.h"
 
 // link the global data.
+extern CoreMgr *data_coreMgr;
 extern MemoryPool *data_MemPool;
 extern VolInfoMgr *data_VolInfos;
 extern VolHandleMgr *data_VolHandles;
