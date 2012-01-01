@@ -252,6 +252,9 @@ void* MemoryPool::realloc (void* pSrc, size_t Size)
             }
 
 #endif
+            size_t DeltaSize = (oldBlocks - newBlocks) * mp_SingleBlockSize;
+            m_freePoolSize += DeltaSize;
+            m_usedPoolSize -= DeltaSize;
             m_allocMutex.unlock();
             return pSrc;
         }
@@ -275,6 +278,9 @@ void* MemoryPool::realloc (void* pSrc, size_t Size)
             if (isGood)
             {
                 ptrBlock->UsedSize = Size;
+                size_t DeltaSize = (newBlocks - oldBlocks) * mp_SingleBlockSize;
+                m_freePoolSize -= DeltaSize;
+                m_usedPoolSize += DeltaSize;
                 m_allocMutex.unlock();
                 return pSrc;
             }
