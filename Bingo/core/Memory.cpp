@@ -308,15 +308,18 @@ void* MemoryPool::realloc (void* pSrc, size_t Size)
 }
 void MemoryPool::free (void* pSrc)
 {
-    BlockPtr ptrBlock = FindBlockHoldingPointerTo (pSrc);
+    synchronized (m_allocMutex)
+    {
+        BlockPtr ptrBlock = FindBlockHoldingPointerTo (pSrc);
 
-    if (ptrBlock != m_memBlocks.end())
-        FreeBlocks (ptrBlock);
-    else
-        Log::e (L"Free memory fails, request pSrc[0x%016I64x] isn't in pool", pSrc);
+        if (ptrBlock != m_memBlocks.end())
+            FreeBlocks (ptrBlock);
+        else
+            Log::e (L"Free memory fails, request pSrc[0x%016I64x] isn't in pool", pSrc);
 
-    assert ( (m_objectCount > 0) && "ERROR : Request to delete more Memory then allocated.") ;
-    m_objectCount--;
+        assert ( (m_objectCount > 0) && "ERROR : Request to delete more Memory then allocated.") ;
+        m_objectCount--;
+    }
 }
 bool MemoryPool::isValidPointer (void* pSrc)
 {
