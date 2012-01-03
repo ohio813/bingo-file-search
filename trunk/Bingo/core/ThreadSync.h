@@ -19,6 +19,7 @@
 #define THREADSYNC_H
 
 #include <Windows.h>
+#include <queue>
 
 class Mutex
 {
@@ -45,6 +46,20 @@ private:
 };
 
 #define synchronized(M)  for(Lock M##_lock = M; M##_lock; M##_lock.setUnlock())
+
+class Semaphore
+{
+public:
+    Semaphore();
+    Semaphore (long initCount);
+    ~Semaphore();
+    void wait();
+    void signal (long count = 1);
+private:
+    int m_Value;
+    Mutex m_Lock;
+    std::queue<HANDLE> m_ThreadQueue;
+};
 
 #endif
 ///:~

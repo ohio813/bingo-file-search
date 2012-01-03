@@ -56,4 +56,39 @@ Lock::operator bool() const
     return m_locked;
 }
 
+Semaphore::Semaphore() : m_Value (0) {}
+Semaphore::Semaphore (long initCount) : m_Value (initCount) {}
+Semaphore::~Semaphore() {}
+void Semaphore::wait()
+{
+    m_Lock.lock();
+
+    if (--m_Value < 0)
+    {
+        HANDLE curThread = GetCurrentThread();
+        HANDLE curProcess = GetCurrentProcess();
+        DuplicateHandle (curProcess, curThread, curProcess, &curThread, 0, false, DUPLICATE_SAME_ACCESS);
+        m_ThreadQueue.push (curThread);
+        m_Lock.unlock();
+        SuspendThread (curThread);
+    }
+    else
+        m_Lock.unlock();
+}
+void Semaphore::signal (long count)
+{
+    m_Lock.lock();
+    m_Value += count;
+
+    if (m_Value <= 0)
+    {
+        HANDLE wakeupThread = m_ThreadQueue.front();
+        m_ThreadQueue.pop();
+        m_Lock.unlock();
+        ResumeThread (wakeupThread);
+    }
+    else
+        m_Lock.unlock();
+}
+
 ///:~
