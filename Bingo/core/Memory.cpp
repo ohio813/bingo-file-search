@@ -484,6 +484,8 @@ void MemoryPool::FreeAllAllocatedMemory()
 }
 MemoryPool::BlockPtr MemoryPool::FindBlockSuitableToHoldMemory (const std::size_t &Size)
 {
+    unsigned int BlocksToHold = mp_NeedBlocks (Size);
+
     for (unsigned int i = 0; i < m_blockCount;)
     {
         if (m_pCurBlock == m_memBlocks.end())
@@ -492,7 +494,30 @@ MemoryPool::BlockPtr MemoryPool::FindBlockSuitableToHoldMemory (const std::size_
         if (m_pCurBlock->UsedSize == 0)
         {
             if (m_pCurBlock->DataSize >= Size)
-                return m_pCurBlock;
+            {
+                BlockPtr tmp_Ptr = m_pCurBlock;
+                unsigned int j;
+
+                for (j = 0; j < BlocksToHold; ++j)
+                {
+                    if (tmp_Ptr->UsedSize == 0)
+                        tmp_Ptr++;
+                    else
+                        break;
+                }
+
+                if (j == BlocksToHold)
+                    return m_pCurBlock;
+                else
+                {
+                    m_pCurBlock = tmp_Ptr;
+
+                    for (; j < BlocksToHold; ++j)
+                        m_pCurBlock++;
+
+                    i += BlocksToHold;
+                }
+            }
             else
             {
                 unsigned int BlocksToSkip = mp_NeedBlocks (m_pCurBlock->DataSize);
