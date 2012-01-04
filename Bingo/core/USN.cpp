@@ -19,6 +19,7 @@
 #include "USN.h"
 #include "Data.h"
 #include "Memory.h"
+#include "VolumeLetter.h"
 #include <string>
 #include "../util/StringConvert.h"
 #include "../util/Log.h"
@@ -41,13 +42,17 @@ void VolUSN::StartUp()
     if (QueryUSN())
     {
         Log::v (L"Found exist USN journal of driver[%c:\\].", m_Path);
-        //
-        //read old usn
-        //if db not exist goto NewStart
-        //if db.oldusn != m_UsnInfo.UsnJournalID (/*DeleteUSN();*/goto NewStart)
-        //ReadUSN(lastNextUSN,false)
-        //CreateThread
-        //
+        QMap<char, ConfigDBLastRecordTableNode>::const_iterator ptr =
+            data_configDB->m_LastRecord.find (WChartoCharLetter (m_Path));
+
+        if (ptr == data_configDB->m_LastRecord.end())
+            goto NewStart;
+
+        if (ptr.value().UsnJournalID != m_UsnInfo.UsnJournalID)
+            goto NewStart;
+
+        ReadUSN (ptr.value().NextUsn, false);
+        m_hMonitor = CreateThread (NULL, 0, ReadUSNThread , this, 0, NULL);
     }
     else
     {
@@ -92,9 +97,12 @@ void VolUSN::Exit()
     {
         m_isActive = false;
     }
-    WaitForSingleObject (m_hMonitor, 2000);
-    //db flush
-    // write m_UsnInfo.UsnJournalID m_UsnInfo.NextUsn
+
+    if (WaitForSingleObject (m_hMonitor, 2000) == WAIT_TIMEOUT)
+        TerminateThread (m_hMonitor, 0);
+
+    data_configDB->m_LastRecord.insert (WChartoCharLetter (m_Path),
+                                        ConfigDBLastRecordTableNode (m_UsnInfo.UsnJournalID, m_UsnInfo.NextUsn));
 }
 void VolUSN::Disable()
 {
@@ -104,7 +112,12 @@ void VolUSN::Disable()
     }
     WaitForSingleObject (m_hMonitor, 2000);
     DeleteUSN();
-    // set db disable
+    data_configDB->m_Disable.insert (WChartoCharLetter (m_Path));
+    QMap<char, ConfigDBLastRecordTableNode>::iterator ptr =
+        data_configDB->m_LastRecord.find (WChartoCharLetter (m_Path));
+
+    if (ptr != data_configDB->m_LastRecord.end())
+        data_configDB->m_LastRecord.erase (ptr);
 }
 bool VolUSN::isActive()
 {

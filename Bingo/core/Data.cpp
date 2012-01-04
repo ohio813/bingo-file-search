@@ -24,13 +24,13 @@ CoreMgr *data_coreMgr;
 MemoryPool *data_MemPool;
 VolInfoMgr *data_VolInfos;
 VolHandleMgr *data_VolHandles;
+ConfigDB *data_configDB;
 Language *uidata_Lang;
 
 void InitGlobalData()
 {
     data_MemPool = new MemoryPool();
     uidata_Lang = new Language();
-    data_VolInfos = new VolInfoMgr();
     data_VolHandles = new VolHandleMgr();
     NTFS::data_volNTFSInfoCache = new NTFS::VolNTFSInfoCache();
     data_coreMgr = new CoreMgr();
@@ -38,6 +38,7 @@ void InitGlobalData()
 void DestroyGlobalData()
 {
     delete data_coreMgr;
+    delete data_configDB;
     delete NTFS::data_volNTFSInfoCache;
     delete data_VolInfos;
     delete data_VolHandles;
