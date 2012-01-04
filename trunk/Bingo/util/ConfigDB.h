@@ -14,27 +14,42 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-///:Data.h
-#ifndef DATA_H
-#define DATA_H
+///:ConfigDB.h
+#ifndef CONFIGDB_H
+#define CONFIGDB_H
 
-#include "CoreMgr.h"
-#include "VolumeMgr.h"
-#include "Memory.h"
-#include "../util/ConfigDB.h"
-#include "../ui/Language.h"
+#include <QtSql>
+#include <QMap>
+#include <QSet>
 
-// link the global data.
-extern CoreMgr *data_coreMgr;
-extern MemoryPool *data_MemPool;
-extern VolInfoMgr *data_VolInfos;
-extern VolHandleMgr *data_VolHandles;
-extern ConfigDB *data_configDB;
-extern Language *uidata_Lang;
+typedef struct ConfigDBLastRecordTableNode
+{
+    ConfigDBLastRecordTableNode (unsigned __int64 usnJournalID, unsigned __int64 nextUsn)
+    {
+        UsnJournalID = usnJournalID;
+        NextUsn = nextUsn;
+    }
+    unsigned __int64 UsnJournalID;
+    unsigned __int64 NextUsn;
+} ConfigDBLastRecordTableNode;
 
-// global data associated function
-void InitGlobalData();        // initial data
-void DestroyGlobalData(); // free data
+class ConfigDB
+{
+public:
+    ConfigDB();
+    ~ConfigDB()
+    {
+        WriteTable ();
+    }
+    QMap <char, ConfigDBLastRecordTableNode> m_LastRecord;
+    QSet <char> m_Disable;
+    void WriteTable ();
+private:
+    void ReadTable (int i);
+    void CreateTable (int i);
+    QSqlDatabase m_db;
+    QSqlQuery m_query;
+};
 
 #endif
 ///:~
