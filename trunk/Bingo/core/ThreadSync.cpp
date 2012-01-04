@@ -177,26 +177,35 @@ void MutilProcessorThread::start()
 }
 void MutilProcessorThread::suspend()
 {
-    SuspendThread (m_hThread);
+    if (m_hThread != INVALID_HANDLE_VALUE)
+        SuspendThread (m_hThread);
 }
 void MutilProcessorThread::resume()
 {
-    ResumeThread (m_hThread);
+    if (m_hThread != INVALID_HANDLE_VALUE)
+        ResumeThread (m_hThread);
 }
 void MutilProcessorThread::wait()
 {
-    WaitForSingleObject (m_hThread, INFINITE);
+    if (m_hThread != INVALID_HANDLE_VALUE)
+        WaitForSingleObject (m_hThread, INFINITE);
 }
 DWORD MutilProcessorThread::wait (DWORD timeout)
 {
-    return WaitForSingleObject (m_hThread, timeout);
+    if (m_hThread != INVALID_HANDLE_VALUE)
+        return WaitForSingleObject (m_hThread, timeout);
+    else
+        return WAIT_FAILED;
 }
 void MutilProcessorThread::terminate()
 {
-    TerminateThread (m_hThread, 0);
-    synchronized (RunningThreadCountMutex)
+    if (m_hThread != INVALID_HANDLE_VALUE)
     {
-        RunningThreadCount--;
+        TerminateThread (m_hThread, 0);
+        synchronized (RunningThreadCountMutex)
+        {
+            RunningThreadCount--;
+        }
     }
 }
 HANDLE MutilProcessorThread::getHandle()
