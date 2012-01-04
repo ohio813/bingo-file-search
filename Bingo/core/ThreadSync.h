@@ -81,7 +81,7 @@ public:
     MutilProcessorThread();
     ~MutilProcessorThread();
     virtual void run();
-    void start();
+    bool start();
     void suspend();
     void resume();
     void wait();

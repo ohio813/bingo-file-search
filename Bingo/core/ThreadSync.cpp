@@ -160,7 +160,7 @@ MutilProcessorThread::~MutilProcessorThread()
         CloseHandle (m_hThread);
 }
 void MutilProcessorThread::run() {}
-void MutilProcessorThread::start()
+bool MutilProcessorThread::start()
 {
     m_hThread = CreateThread (NULL, 0, MutilProcessorThread::ThreadFunc, this, CREATE_SUSPENDED, NULL);
 
@@ -173,7 +173,10 @@ void MutilProcessorThread::start()
         }
         SetThreadAffinityMask (m_hThread, m_ProcessorMask);
         ResumeThread (m_hThread);
+        return true;
     }
+    else
+        return false;
 }
 void MutilProcessorThread::suspend()
 {
@@ -201,10 +204,22 @@ void MutilProcessorThread::terminate()
 {
     if (m_hThread != INVALID_HANDLE_VALUE)
     {
-        TerminateThread (m_hThread, 0);
-        synchronized (RunningThreadCountMutex)
+        TerminateThread (m_hThread, 1);
+        DWORD exitCode;
+        GetExitCodeThread (m_hThread, &exitCode);
+
+        if (exitCode == STILL_ACTIVE)
         {
-            RunningThreadCount--;
+            WaitForSingleObject (m_hThread, 500);
+            GetExitCodeThread (m_hThread, &exitCode);
+        }
+
+        if (exitCode == 1)
+        {
+            synchronized (RunningThreadCountMutex)
+            {
+                RunningThreadCount--;
+            }
         }
     }
 }
