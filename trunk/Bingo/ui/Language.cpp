@@ -21,9 +21,17 @@
 #include <vector>
 using namespace std;
 
+Language::Language()
+{
+    qmPath = QCoreApplication::applicationDirPath();
+    configPath = qmPath.toStdWString();
+    configPath += L"/lang/config.ini";
+    qmPath += "/lang/bingo_%1.qm";
+}
+
 void Language::loadLang()
 {
-    wstring defaultLang = Ini_ReadValue (L"lang/config.ini", L"Config", L"Default");
+    wstring defaultLang = Ini_ReadValue (configPath, L"Config", L"Default");
     QLocale defaultLocal;
 
     if (defaultLang == L"")
@@ -33,21 +41,21 @@ void Language::loadLang()
 
     QTranslator qtTranslator;
 
-    if (!qtTranslator.load (QString ("lang/bingo_%1.qm").arg (defaultLocal.name())))
-        qtTranslator.load (QString ("lang/bingo_%1.qm").arg (QLocale (QLocale::English).name()));
+    if (!qtTranslator.load (qmPath.arg (defaultLocal.name())))
+        qtTranslator.load (qmPath.arg (QLocale (QLocale::English).name()));
 
     qApp->installTranslator (&qtTranslator);
 }
 
 QLocale Language::getCurLang()
 {
-    wstring defaultLang = Ini_ReadValue (L"lang/config.ini", L"Config", L"Default");
+    wstring defaultLang = Ini_ReadValue (configPath, L"Config", L"Default");
 
     if (defaultLang == L"")
     {
         QLocale locale = QLocale::system();
 
-        if (QFile::exists (QString ("lang/bingo_%1.qm").arg (locale.name())))
+        if (QFile::exists (qmPath.arg (locale.name())))
             return locale;
         else
             return QLocale (QLocale::English);
@@ -58,13 +66,13 @@ QLocale Language::getCurLang()
 
 void Language::setCurLang (QLocale lang)
 {
-    if (!QFile::exists (QString ("lang/bingo_%1.qm").arg (lang.name())))
+    if (!QFile::exists (qmPath.arg (lang.name())))
         return;
     else
-        Ini_WriteValue (L"lang/config.ini", L"Config", L"Default", lang.name().toStdWString());
+        Ini_WriteValue (configPath, L"Config", L"Default", lang.name().toStdWString());
 
     QTranslator qtTranslator;
-    qtTranslator.load (QString ("lang/bingo_%1.qm").arg (lang.name()));
+    qtTranslator.load (qmPath.arg (lang.name()));
     qApp->installTranslator (&qtTranslator);
     emit refreshLangRequest();
 }
@@ -73,7 +81,7 @@ vector<QLocale> Language::listAllLang()
 {
     vector<wstring> SectionValues;
     vector<QLocale> ret;
-    Ini_ReadSection (L"lang/config.ini", L"Lang", SectionValues);
+    Ini_ReadSection (configPath, L"Lang", SectionValues);
 
     for (int i = 0; i < SectionValues.size(); ++i)
         ret.push_back (QLocale (QString::fromStdWString (SectionValues[i])));

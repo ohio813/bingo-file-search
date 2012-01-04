@@ -21,11 +21,13 @@
 #include <QtCore>
 #include <QtGui>
 #include <vector>
+#include <string>
 
 class Language: public QObject
 {
     Q_OBJECT
 public:
+	Language();
     void loadLang();
     QLocale getCurLang();
     std::vector<QLocale> listAllLang();
@@ -33,6 +35,9 @@ public:
 signals:
     void explains();
     void refreshLangRequest();
+private:
+    std::wstring configPath;
+    QString qmPath;
 };
 
 #endif
