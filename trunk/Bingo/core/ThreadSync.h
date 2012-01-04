@@ -50,15 +50,55 @@ private:
 class Semaphore
 {
 public:
-    Semaphore();
-    Semaphore (long initCount);
+    Semaphore (int initCount = 0);
     ~Semaphore();
-    void wait();
-    void signal (long count = 1);
+    void wait (int count = 1);
+    void signal (int count = 1);
 private:
     int m_Value;
     Mutex m_Lock;
     std::queue<HANDLE> m_ThreadQueue;
+};
+
+class ReadWriteSync
+{
+public:
+    ReadWriteSync();
+    ~ReadWriteSync();
+    void beginread();
+    void endread();
+    void beginwrite();
+    void endwrite();
+private:
+    Mutex m_WriteLock;
+    Mutex m_ReadCountLock;
+    int m_ReadCount;
+};
+
+class MutilProcessorThread
+{
+public:
+    MutilProcessorThread();
+    ~MutilProcessorThread();
+    virtual void run();
+    void start();
+    void suspend();
+    void resume();
+    void wait();
+    DWORD wait (DWORD timeout);
+    void terminate();
+    HANDLE getHandle();
+    DWORD_PTR getProcessorMask();
+    static DWORD_PTR getRunningThreadCount();
+    static DWORD_PTR getProcessorCount();
+protected:
+    static DWORD WINAPI ThreadFunc (LPVOID in);
+    HANDLE m_hThread;
+    static DWORD_PTR ProcessorCount;
+    static DWORD_PTR RunningThreadCount;
+    DWORD_PTR m_ProcessorMask;
+    static DWORD_PTR GetNumCPUs();
+    static Mutex RunningThreadCountMutex;
 };
 
 #endif

@@ -56,14 +56,14 @@ Lock::operator bool() const
     return m_locked;
 }
 
-Semaphore::Semaphore() : m_Value (0) {}
-Semaphore::Semaphore (long initCount) : m_Value (initCount) {}
+Semaphore::Semaphore (int initCount) : m_Value (initCount) {}
 Semaphore::~Semaphore() {}
-void Semaphore::wait()
+void Semaphore::wait (int count)
 {
     m_Lock.lock();
+    m_Value -= count;
 
-    if (--m_Value < 0)
+    if (m_Value < 0)
     {
         HANDLE curThread = GetCurrentThread();
         HANDLE curProcess = GetCurrentProcess();
@@ -75,7 +75,7 @@ void Semaphore::wait()
     else
         m_Lock.unlock();
 }
-void Semaphore::signal (long count)
+void Semaphore::signal (int count)
 {
     m_Lock.lock();
     m_Value += count;
@@ -91,4 +91,120 @@ void Semaphore::signal (long count)
         m_Lock.unlock();
 }
 
+ReadWriteSync::ReadWriteSync() : m_ReadCount (0) {}
+ReadWriteSync::~ReadWriteSync() {}
+void ReadWriteSync::beginread()
+{
+    synchronized (m_ReadCountLock)
+    {
+        m_ReadCount++;
+
+        if (m_ReadCount == 1)
+            m_WriteLock.lock();
+    }
+}
+void ReadWriteSync::endread()
+{
+    synchronized (m_ReadCountLock)
+    {
+        m_ReadCount--;
+
+        if (m_ReadCount == 0)
+            m_WriteLock.unlock();
+    }
+}
+void ReadWriteSync::beginwrite()
+{
+    m_WriteLock.lock();
+}
+void ReadWriteSync::endwrite()
+{
+    m_WriteLock.unlock();
+}
+
+DWORD_PTR MutilProcessorThread::ProcessorCount = GetNumCPUs();
+DWORD_PTR MutilProcessorThread::RunningThreadCount = 0;
+Mutex MutilProcessorThread::RunningThreadCountMutex = Mutex();
+DWORD_PTR MutilProcessorThread::GetNumCPUs()
+{
+    SYSTEM_INFO m_si = {0};
+    GetSystemInfo (&m_si);
+    return (DWORD_PTR) m_si.dwNumberOfProcessors;
+}
+DWORD WINAPI MutilProcessorThread::ThreadFunc (LPVOID in)
+{
+    static_cast<MutilProcessorThread*> (in)->run();
+    synchronized (RunningThreadCountMutex)
+    {
+        RunningThreadCount--;
+    }
+    return 0;
+}
+DWORD_PTR MutilProcessorThread::getRunningThreadCount()
+{
+    DWORD_PTR ret;
+    synchronized (RunningThreadCountMutex)
+    {
+        ret = RunningThreadCount;
+    }
+    return ret;
+}
+DWORD_PTR MutilProcessorThread::getProcessorCount()
+{
+    return ProcessorCount;
+}
+MutilProcessorThread::MutilProcessorThread() : m_hThread (INVALID_HANDLE_VALUE), m_ProcessorMask (1) {}
+MutilProcessorThread::~MutilProcessorThread()
+{
+    if (m_hThread != INVALID_HANDLE_VALUE)
+        CloseHandle (m_hThread);
+}
+void MutilProcessorThread::run() {}
+void MutilProcessorThread::start()
+{
+    m_hThread = CreateThread (NULL, 0, MutilProcessorThread::ThreadFunc, this, CREATE_SUSPENDED, NULL);
+
+    if (m_hThread != INVALID_HANDLE_VALUE)
+    {
+        synchronized (RunningThreadCountMutex)
+        {
+            RunningThreadCount++;
+            m_ProcessorMask = 1 << ( (RunningThreadCount - 1) % ProcessorCount);
+        }
+        SetThreadAffinityMask (m_hThread, m_ProcessorMask);
+        ResumeThread (m_hThread);
+    }
+}
+void MutilProcessorThread::suspend()
+{
+    SuspendThread (m_hThread);
+}
+void MutilProcessorThread::resume()
+{
+    ResumeThread (m_hThread);
+}
+void MutilProcessorThread::wait()
+{
+    WaitForSingleObject (m_hThread, INFINITE);
+}
+DWORD MutilProcessorThread::wait (DWORD timeout)
+{
+    return WaitForSingleObject (m_hThread, timeout);
+}
+void MutilProcessorThread::terminate()
+{
+    TerminateThread (m_hThread, 0);
+    synchronized (RunningThreadCountMutex)
+    {
+        RunningThreadCount--;
+    }
+}
+HANDLE MutilProcessorThread::getHandle()
+{
+    return m_hThread;
+}
+DWORD_PTR MutilProcessorThread::getProcessorMask()
+{
+    return m_ProcessorMask;
+}
 ///:~
