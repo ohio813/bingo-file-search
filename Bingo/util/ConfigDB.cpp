@@ -22,7 +22,7 @@
 
 ConfigDB::ConfigDB()
 {
-    m_db = QSqlDatabase::addDatabase ("QSQLITE");
+    m_db = QSqlDatabase::addDatabase ("QSQLITE", "config_db");
     QString db_Path = QCoreApplication::applicationDirPath() + "/Data/";
     m_db.setDatabaseName (db_Path + "config.db");
     m_LastRecord.clear();
