@@ -332,6 +332,55 @@ bool MemoryPool::isValidPointer (void* pSrc)
 
     return false ;
 }
+void MemoryPool::gc()
+{
+    synchronized (m_allocMutex)
+    {
+        m_pCurBlock = m_memBlocks.begin();
+        BlockPtr ptr = m_pCurBlock;
+        // jump first block
+        unsigned int BlocksToSkip = mp_NeedBlocks (mp_InitPoolSize);
+
+        for (unsigned int j = 0; j < BlocksToSkip; ++j)
+            ptr++;
+
+        BlockPtr begin = ptr;
+        bool Using = true;
+        bool jumpOut = false;
+
+        while (true)
+        {
+            if ( (jumpOut = (ptr == m_memBlocks.end())) || ptr->IsAllocationBlock)
+            {
+                if (!Using)
+                {
+                    size_t deltaSize = begin->DataSize;
+                    delete [] begin->Data;
+                    m_memBlocks.erase (begin, ptr);
+                    m_totalPoolSize -= deltaSize;
+                    m_freePoolSize -= deltaSize;
+                }
+
+                if (jumpOut)
+                    break;
+
+                begin = ptr;
+                Using = false;
+            }
+
+            if (ptr->UsedSize != 0)
+            {
+                Using = true;
+                BlocksToSkip = mp_NeedBlocks (ptr->DataSize);
+
+                for (unsigned int j = 0; j < BlocksToSkip; ++j)
+                    ptr++;
+            }
+            else
+                ptr++;
+        }
+    }
+}
 void MemoryPool::DumpPoolBin (std::wstring fileName)
 {
     HANDLE hFile = CreateFileW (fileName.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);

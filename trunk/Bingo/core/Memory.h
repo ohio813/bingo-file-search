@@ -66,6 +66,7 @@ public:
     void* realloc (void* pSrc, size_t Size);
     void free (void* pSrc);
     bool isValidPointer (void* pSrc) ;
+    void gc();
     void DumpPoolBin (std::wstring fileName);
     void DumpPoolTxt (std::wstring fileName);
     void DumpPoolScreen ();
