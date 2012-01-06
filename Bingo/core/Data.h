@@ -21,6 +21,7 @@
 #include "CoreMgr.h"
 #include "VolumeMgr.h"
 #include "Memory.h"
+#include "Moniter.h"
 #include "../util/ConfigDB.h"
 #include "../util/MasterDB.h"
 #include "../util/PathDB.h"
@@ -34,6 +35,7 @@ extern VolHandleMgr *data_VolHandles;
 extern ConfigDB *data_configDB;
 extern MasterDB *data_masterDB;
 extern PathDB *data_pathDB;
+extern Moniter *data_Moniter;
 extern Language *uidata_Lang;
 
 // global data associated function

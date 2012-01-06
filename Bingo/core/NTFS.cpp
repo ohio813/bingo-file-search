@@ -118,8 +118,15 @@ bool File_Info_by_NTFS (wchar_t Path, DWORDLONG frn
     PATTRIBUTE pa = (PATTRIBUTE) ( (char*) pfrh + pfrh->AttributesOffset);
     PSTANDARD_INFORMATION psi;
 
-    while (pa->AttributeType != AttributeStandardInformation)
+    while (pa->AttributeType != AttributeStandardInformation && pa->AttributeType != AttributeEnd)
         pa = (PATTRIBUTE) ( (char*) pa + pa->Length);
+
+    if (pa->AttributeType == AttributeEnd)
+    {
+        //It means file has been deleted.
+        data_MemPool->free (Buff);
+        return false;
+    }
 
     psi = PSTANDARD_INFORMATION ( (char*) pa + PRESIDENT_ATTRIBUTE (pa)->ValueOffset);
 
