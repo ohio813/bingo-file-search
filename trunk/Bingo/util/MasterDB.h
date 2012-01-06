@@ -34,6 +34,7 @@ public:
     void DropTable (char Path);
     void EnumInsert (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
                      DWORD attrib, DWORD size, TIME32 createTime, TIME32 writeTime);
+    void ReadLastUSNDel (char Path, unsigned __int64 frn);
     QSqlQuery* copyRootQuery();
 private:
     QSqlDatabase m_db;

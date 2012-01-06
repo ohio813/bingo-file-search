@@ -27,6 +27,7 @@ VolHandleMgr *data_VolHandles;
 ConfigDB *data_configDB;
 MasterDB *data_masterDB;
 PathDB *data_pathDB;
+Moniter *data_Moniter;
 Language *uidata_Lang;
 
 void InitGlobalData()
@@ -40,6 +41,7 @@ void InitGlobalData()
 void DestroyGlobalData()
 {
     delete data_coreMgr;
+	delete data_Moniter;
 	delete data_masterDB;
 	delete data_pathDB;
     delete data_configDB;

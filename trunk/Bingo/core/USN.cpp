@@ -21,6 +21,7 @@
 #include "Memory.h"
 #include "VolumeLetter.h"
 #include "NTFS.h"
+#include "Moniter.h"
 #include <string>
 #include "../util/StringConvert.h"
 #include "../util/Log.h"
@@ -208,15 +209,22 @@ void VolUSN::EnumUSN()
         {
             unsigned __int64 size = 0;
             FILETIME createTime, writeTime;
+            bool fileInfoRet;
 
             if (UsnRecord->FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                File_Info_by_NTFS (m_Path, UsnRecord->FileReferenceNumber , &createTime, &writeTime, NULL);
+                fileInfoRet = File_Info_by_NTFS (m_Path, UsnRecord->FileReferenceNumber , &createTime, &writeTime, NULL);
             else
-                File_Info_by_NTFS (m_Path, UsnRecord->FileReferenceNumber , &createTime, &writeTime, &size);
+                fileInfoRet = File_Info_by_NTFS (m_Path, UsnRecord->FileReferenceNumber , &createTime, &writeTime, &size);
 
-            data_masterDB->EnumInsert (Path, UsnRecord->FileReferenceNumber ,
-                                       UsnRecord->ParentFileReferenceNumber, _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)),
-                                       UsnRecord->FileAttributes, FileSizeinKB (size), FILETIMEtoTIME32 (createTime), FILETIMEtoTIME32 (writeTime));
+            if (fileInfoRet)
+                data_masterDB->EnumInsert (Path, UsnRecord->FileReferenceNumber ,
+                                           UsnRecord->ParentFileReferenceNumber, _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)),
+                                           UsnRecord->FileAttributes, FileSizeinKB (size), FILETIMEtoTIME32 (createTime), FILETIMEtoTIME32 (writeTime));
+            else
+                data_masterDB->EnumInsert (Path, UsnRecord->FileReferenceNumber ,
+                                           UsnRecord->ParentFileReferenceNumber, _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)),
+                                           UsnRecord->FileAttributes, 0, 0, 0);
+
             // next record.
             DWORD recordLen = UsnRecord->RecordLength;
             dwRetBytes -= recordLen;
@@ -240,6 +248,10 @@ void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
     char* ReadBuff = (char *) data_MemPool->malloc (READ_BUF_LEN);
     DWORD usnDataSize;
     PUSN_RECORD UsnRecord;
+    MoniterAddPtr _add = Monitor ? &MoniterAdd : &ReadLastUSNAddORUpdate;
+    MoniterDelPtr _del = Monitor ? &MoniterDel : &ReadLastUSNDel;
+    MoniterUpdatePtr _update = Monitor ? &MoniterUpdate : &ReadLastUSNAddORUpdate;
+    char Path = WChartoCharLetter (m_Path);
 
     while (DeviceIoControl (m_hVol, FSCTL_READ_USN_JOURNAL, &rujd,
                             sizeof (rujd), ReadBuff, READ_BUF_LEN, &usnDataSize, NULL) != 0)
@@ -252,23 +264,19 @@ void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
             if (UsnRecord->Reason & USN_REASON_FILE_CREATE)
             {
                 // File Created
-                _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)); // Get file name coding in UTF-8.
-                UsnRecord->FileReferenceNumber;
-                UsnRecord->ParentFileReferenceNumber;
-                UsnRecord->FileAttributes;
+                (*_add) (Path, UsnRecord->FileReferenceNumber, UsnRecord->ParentFileReferenceNumber,
+                         _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)), UsnRecord->FileAttributes);
             }
             else if (UsnRecord->Reason & USN_REASON_FILE_DELETE)
             {
                 // File Deleted
-                UsnRecord->FileReferenceNumber;
+                (*_del) (Path, UsnRecord->FileReferenceNumber);
             }
             else
             {
                 // File Modified
-                _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)); // Get file name coding in UTF-8.
-                UsnRecord->FileReferenceNumber;
-                UsnRecord->ParentFileReferenceNumber;
-                UsnRecord->FileAttributes;
+                (*_update) (Path, UsnRecord->FileReferenceNumber, UsnRecord->ParentFileReferenceNumber,
+                            _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)), UsnRecord->FileAttributes);
                 // Pay attention when changed reason it's folder's ParentFileReferenceNumber changed, which means this folder
                 // has been moved to other place. In this case you need change every subfolder file's path in database.
             }

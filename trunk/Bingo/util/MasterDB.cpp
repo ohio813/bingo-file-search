@@ -169,6 +169,13 @@ void MasterDB::EnumInsert (char Path, unsigned __int64 frn, unsigned __int64 pfr
     m_query.bindValue (6, uint (writeTime));
     m_query.exec();
 }
+void MasterDB::ReadLastUSNDel (char Path, unsigned __int64 frn)
+{
+    QSqlQuery delQuery (m_query);
+    delQuery.prepare (QString ("delete from Master_%1 where frn=?").arg (Path));
+    delQuery.bindValue (0, qulonglong (frn));
+    delQuery.exec();
+}
 QSqlQuery* MasterDB::copyRootQuery()
 {
     return new QSqlQuery (m_db);
