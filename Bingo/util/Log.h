@@ -19,6 +19,7 @@
 #define LOG_H
 
 #include <string>
+#include <QString>
 #include "../core/ThreadSync.h"
 
 class Log
@@ -27,15 +28,23 @@ public:
     static void enable();
     static void disable();
     static void setlogfile (std::wstring logfile);
+    static void setlogfile (QString logfile);
     static void v (std::wstring log);
     static void w (std::wstring log);
     static void e (std::wstring log);
+    static void v (QString log);
+    static void w (QString log);
+    static void e (QString log);
+    static void v (const char* log);
+    static void w (const char* log);
+    static void e (const char* log);
     static void v (wchar_t * format, ...);
     static void w (wchar_t * format, ...);
     static void e (wchar_t * format, ...);
 private:
     static bool _enable;
-    static std::wstring _logfile;
+    static QString _logfile;
+    static Mutex _logMutex;
 };
 
 #endif

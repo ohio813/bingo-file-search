@@ -20,6 +20,7 @@
 #include "Data.h"
 #include "Memory.h"
 #include "VolumeLetter.h"
+#include "NTFS.h"
 #include <string>
 #include "../util/StringConvert.h"
 #include "../util/Log.h"
@@ -39,25 +40,50 @@ VolUSN::VolUSN (wchar_t Path)
 }
 void VolUSN::StartUp()
 {
+    data_VolHandles->open (m_Path);
+    m_hVol = (*data_VolHandles) [m_Path];
+    bool jumpCreate = false;
+
     if (QueryUSN())
     {
         Log::v (L"Found exist USN journal of driver[%c:\\].", m_Path);
+        jumpCreate = true;
+
+        if (!data_masterDB->TableContains (m_Path))
+            goto NewStart;
+
         QMap<char, ConfigDBLastRecordTableNode>::const_iterator ptr =
             data_configDB->m_LastRecord.find (WChartoCharLetter (m_Path));
 
         if (ptr == data_configDB->m_LastRecord.end())
+        {
+            data_masterDB->DeleteTable (m_Path);
             goto NewStart;
+        }
 
         if (ptr.value().UsnJournalID != m_UsnInfo.UsnJournalID)
+        {
+            data_masterDB->DeleteTable (m_Path);
             goto NewStart;
+        }
 
         ReadUSN (ptr.value().NextUsn, false);
+        Log::v (L"Read Last USN journal of driver[%c:\\] successes.", m_Path);
         m_hMonitor = CreateThread (NULL, 0, ReadUSNThread , this, 0, NULL);
     }
     else
     {
 NewStart:
+        data_masterDB->CreateTable (m_Path);
         Log::v (L"Start a new USN journal of driver[%c:\\].", m_Path);
+
+        if (jumpCreate)
+        {
+            if (m_UsnInfo.FirstUsn == 0)
+                goto JmupCreate;
+            else
+                DeleteUSN();
+        }
 
         if (CreateUSN())
             Log::v (L"Create USN journal of driver[%c:\\] successes.", m_Path);
@@ -83,11 +109,13 @@ NewStart:
             return;
         }
 
+JmupCreate:
         synchronized (m_isActive_Mutex)
         {
             m_isActive = true;
         }
         EnumUSN();
+        Log::v (L"Enum USN journal of driver[%c:\\] successes.", m_Path);
         m_hMonitor = CreateThread (NULL, 0, ReadUSNThread , this, 0, NULL);
     }
 }
@@ -103,6 +131,7 @@ void VolUSN::Exit()
 
     data_configDB->m_LastRecord.insert (WChartoCharLetter (m_Path),
                                         ConfigDBLastRecordTableNode (m_UsnInfo.UsnJournalID, m_UsnInfo.NextUsn));
+    data_VolHandles->close (m_Path);
 }
 void VolUSN::Disable()
 {
@@ -118,13 +147,18 @@ void VolUSN::Disable()
 
     if (ptr != data_configDB->m_LastRecord.end())
         data_configDB->m_LastRecord.erase (ptr);
+
+    data_masterDB->DropTable (m_Path);
+    data_VolHandles->close (m_Path);
 }
 bool VolUSN::isActive()
 {
+    bool ret;
     synchronized (m_isActive_Mutex)
     {
-        return m_isActive;
+        ret = m_isActive;
     }
+    return ret;
 }
 bool VolUSN::CreateUSN()
 {
@@ -159,6 +193,7 @@ void VolUSN::EnumUSN()
     char* EnumBuff = (char *) data_MemPool->malloc (ENUM_BUF_LEN);
     DWORD usnDataSize;
     PUSN_RECORD UsnRecord;
+    char Path = WChartoCharLetter (m_Path);
 
     while (DeviceIoControl (m_hVol, FSCTL_ENUM_USN_DATA, &med,
                             sizeof (med), EnumBuff, ENUM_BUF_LEN, &usnDataSize, NULL) != 0)
@@ -168,10 +203,17 @@ void VolUSN::EnumUSN()
 
         while (dwRetBytes > 0)
         {
-            _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)); // Get file name coding in UTF-8.
-            UsnRecord->FileReferenceNumber;
-            UsnRecord->ParentFileReferenceNumber;
-            UsnRecord->FileAttributes;
+            unsigned __int64 size = 0;
+            FILETIME createTime, writeTime;
+
+            if (UsnRecord->FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                File_Info_by_NTFS (m_Path, UsnRecord->FileReferenceNumber , &createTime, &writeTime, NULL);
+            else
+                File_Info_by_NTFS (m_Path, UsnRecord->FileReferenceNumber , &createTime, &writeTime, &size);
+
+            data_masterDB->EnumInsert (Path, UsnRecord->FileReferenceNumber ,
+                                       UsnRecord->ParentFileReferenceNumber, _2utf8 (wstring (UsnRecord->FileName, UsnRecord->FileNameLength / 2)),
+                                       UsnRecord->FileAttributes, FileSizeinKB (size), FILETIMEtoTIME32 (createTime), FILETIMEtoTIME32 (writeTime));
             // next record.
             DWORD recordLen = UsnRecord->RecordLength;
             dwRetBytes -= recordLen;
@@ -264,7 +306,7 @@ void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
 
 DWORD WINAPI ReadUSNThread (LPVOID param)
 {
-    VolUSN* volUSN = (VolUSN*) param;
+    VolUSN* volUSN = static_cast<VolUSN*> (param);
     volUSN->ReadUSN (volUSN->m_UsnInfo.NextUsn, true);
     return 0;
 }

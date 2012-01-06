@@ -17,13 +17,17 @@
 ///:Log.cpp
 #include "Log.h"
 #include <stdarg.h>
-#include <fstream>
+#include <QDateTime>
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
 #include <Windows.h>
 #include <assert.h>
 using namespace std;
 
 bool Log::_enable = false;
-std::wstring Log::_logfile = L".log";
+QString Log::_logfile = ".log";
+Mutex Log::_logMutex = Mutex();
 
 void Log::enable()
 {
@@ -35,6 +39,10 @@ void Log::disable()
 }
 void Log::setlogfile (std::wstring logfile)
 {
+    _logfile = QString::fromStdWString (logfile);
+}
+void Log::setlogfile (QString logfile)
+{
     _logfile = logfile;
 }
 void Log::v (std::wstring log)
@@ -43,19 +51,7 @@ void Log::v (std::wstring log)
     log = L"[verbose]" + log + L"\n";
     OutputDebugStringW (log.c_str());
 #else
-
-    if (!_enable)
-        return;
-
-    SYSTEMTIME curtime;
-    ::GetLocalTime (&curtime);
-    locale &loc = locale::global (locale (locale(), "", LC_CTYPE));
-    wofstream ofile (_logfile, ios::app);
-    locale::global (loc);
-    ofile << L"verbose|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
-          << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
-    ofile.flush();
-    ofile.close();
+    v (QString::fromStdWString (log));
 #endif
 }
 void Log::w (std::wstring log)
@@ -64,51 +60,118 @@ void Log::w (std::wstring log)
     log = L"[warning]" + log + L"\n";
     OutputDebugStringW (log.c_str());
 #else
-
-    if (!_enable)
-        return;
-
-    SYSTEMTIME curtime;
-    ::GetLocalTime (&curtime);
-    locale &loc = locale::global (locale (locale(), "", LC_CTYPE));
-    wofstream ofile (_logfile, ios::app);
-    locale::global (loc);
-    ofile << L"warning|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
-          << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
-    ofile.flush();
-    ofile.close();
+    w (QString::fromStdWString (log));
 #endif
 }
 void Log::e (std::wstring log)
 {
 #ifdef _DEBUG
     log = L"[error]" + log + L"\n";
-	OutputDebugStringW (log.c_str());
-	assert (false && log.c_str());
+    OutputDebugStringW (log.c_str());
+    assert (false);
+#else
+    e (QString::fromStdWString (log));
+#endif
+}
+void Log::v (QString log)
+{
+#ifdef _DEBUG
+    v (log.toStdWString());
 #else
 
     if (!_enable)
         return;
 
-    SYSTEMTIME curtime;
-    ::GetLocalTime (&curtime);
-    locale &loc = locale::global (locale (locale(), "", LC_CTYPE));
-    wofstream ofile (_logfile, ios::app);
-    locale::global (loc);
-    ofile << L"error|" << curtime.wYear << L"-" << curtime.wMonth << L"-" << curtime.wDay << L" "
-          << curtime.wHour << L":" << curtime.wMinute << L":" << curtime.wSecond << "|" << log << endl;
-    ofile.flush();
-    ofile.close();
+    QDateTime now = QDateTime::currentDateTime();
+    synchronized (_logMutex)
+    {
+        QFile file (_logfile);
+
+        if (file.open (QIODevice::Append | QIODevice::WriteOnly))
+        {
+            QTextStream stream (&file);
+            stream << "verbose|" << now.toString() << "|" << log << endl;
+            stream.flush();
+        }
+
+        file.close();
+    }
 #endif
+}
+void Log::w (QString log)
+{
+#ifdef _DEBUG
+    w (log.toStdWString());
+#else
+
+    if (!_enable)
+        return;
+
+    QDateTime now = QDateTime::currentDateTime();
+    synchronized (_logMutex)
+    {
+        QFile file (_logfile);
+
+        if (file.open (QIODevice::Append | QIODevice::WriteOnly))
+        {
+            QTextStream stream (&file);
+            stream << "warning|" << now.toString() << "|" << log << endl;
+            stream.flush();
+        }
+
+        file.close();
+    }
+#endif
+}
+void Log::e (QString log)
+{
+#ifdef _DEBUG
+    e (log.toStdWString());
+#else
+
+    if (!_enable)
+        return;
+
+    QDateTime now = QDateTime::currentDateTime();
+    synchronized (_logMutex)
+    {
+        QFile file (_logfile);
+
+        if (file.open (QIODevice::Append | QIODevice::WriteOnly))
+        {
+            QTextStream stream (&file);
+            stream << "error|" << now.toString() << "|" << log << endl;
+            stream.flush();
+        }
+
+        file.close();
+    }
+#endif
+}
+void Log::v (const char* log)
+{
+    v (QString (log));
+}
+void Log::w (const char* log)
+{
+    w (QString (log));
+}
+void Log::e (const char* log)
+{
+    e (QString (log));
 }
 void Log::v (wchar_t * format, ...)
 {
-	wchar_t log[512] = {0};
-	va_list args;
-	va_start (args, format);
-	_vswprintf (log, format, args);
-	va_end (args);
-	v (wstring (log));
+    wchar_t log[512] = {0};
+    va_list args;
+    va_start (args, format);
+    _vswprintf (log, format, args);
+    va_end (args);
+#ifdef _DEBUG
+    v (wstring (log));
+#else
+    v (QString::fromStdWString (log));
+#endif
 }
 void Log::w (wchar_t * format, ...)
 {
@@ -117,7 +180,11 @@ void Log::w (wchar_t * format, ...)
     va_start (args,  format);
     _vswprintf (log, format, args);
     va_end (args);
+#ifdef _DEBUG
     w (wstring (log));
+#else
+    w (QString::fromStdWString (log));
+#endif
 }
 void Log::e (wchar_t * format, ...)
 {
@@ -126,6 +193,10 @@ void Log::e (wchar_t * format, ...)
     va_start (args,  format);
     _vswprintf (log, format, args);
     va_end (args);
+#ifdef _DEBUG
     e (wstring (log));
+#else
+    e (QString::fromStdWString (log));
+#endif
 }
 ///:~
