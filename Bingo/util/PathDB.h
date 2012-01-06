@@ -59,11 +59,12 @@ class PathGen : public MutilProcessorThread
         QByteArray FileName;
     } _Node;
 public:
-    PathGen() : _cache (20) {}
+    PathGen() : _cache (16) {}
     ~PathGen()
     {
         _findPathQuery.clear();
         _findIndexQuery.clear();
+        _existPathQuery.clear();
         m_masterQuery->clear();
         m_pathQuery->clear();
         delete m_masterQuery;
@@ -78,7 +79,7 @@ private:
     QSqlQuery* m_pathQuery;
     char m_Path;
     QStack<_Node> _nodeStack;
-    QSqlQuery _findPathQuery, _findIndexQuery;
+    QSqlQuery _findPathQuery, _findIndexQuery, _existPathQuery;
     LRUCache<qulonglong, QByteArray> _cache;
 };
 
