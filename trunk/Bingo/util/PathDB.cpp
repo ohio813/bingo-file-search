@@ -86,9 +86,11 @@ void PathGen::run()
     // pre-complie
     _findIndexQuery = QSqlQuery (*m_masterQuery);
     _findPathQuery = QSqlQuery (*m_pathQuery);
+    _existPathQuery = QSqlQuery (*m_pathQuery);
     _findIndexQuery.prepare (QString ("select frn,pfrn,name from Master_%1 where frn=?").arg (m_Path));
     _findPathQuery.prepare (QString ("select path from Path_%1 where frn=?").arg (m_Path));
-    m_pathQuery->prepare (QString ("insert into Path_%1 values (?,?)").arg (m_Path));
+    _existPathQuery.prepare (QString ("select 1 where exists(select 1 from Path_%1 where frn=?)").arg (m_Path));
+    m_pathQuery->prepare (QString ("insert into Path_%1 values (?,?) ").arg (m_Path));
     m_masterQuery->exec (QString ("select frn,pfrn,name from Master_%1").arg (m_Path));
 
     while (m_masterQuery->next())
@@ -112,17 +114,18 @@ void PathGen::run()
 
         while (true)
         {
-            _findPathQuery.bindValue (0, _node.FRN);
-            _findPathQuery.exec();
+            _existPathQuery.bindValue (0, _node.FRN);
+            _existPathQuery.exec();
 
-            if (_findPathQuery.next())
+            if (_existPathQuery.next())
             {
-                _findPathQuery.finish();
+                _existPathQuery.finish();
                 _nodeStack.pop();
                 break;
             }
             else
             {
+                _existPathQuery.finish();
                 _findPathQuery.bindValue (0, _node.PFRN);
                 _findPathQuery.exec();
 
@@ -131,7 +134,7 @@ void PathGen::run()
                     QByteArray tmppath =  _findPathQuery.value (0).toByteArray();
                     _findPathQuery.finish();
 
-                    if (_nodeStack.size() > 1)
+                    if (_nodeStack.size() > 2)
                     {
                         do
                         {
@@ -142,9 +145,24 @@ void PathGen::run()
                             m_pathQuery->exec();
                             m_pathQuery->finish();
                         }
-                        while (_nodeStack.size() > 1);
+                        while (_nodeStack.size() > 2);
 
                         _cache.put (_node.FRN, tmppath);
+                        goto Flag;
+                    }
+                    else
+                    {
+                        while (_nodeStack.size() > 1)
+                        {
+Flag:
+                            _node = _nodeStack.pop();
+                            m_pathQuery->bindValue (0, _node.FRN);
+                            tmppath += ("\\" + _node.FileName);
+                            _cache.put (_node.FRN, tmppath);
+                            m_pathQuery->bindValue (1, tmppath);
+                            m_pathQuery->exec();
+                            m_pathQuery->finish();
+                        }
                     }
 
                     _node = _nodeStack.pop();
@@ -171,7 +189,7 @@ void PathGen::run()
                     }
                     else
                     {
-                        Log::w (QString ("Unknow pfrn for file: ").append (_node.FileName));
+                        Log::w (QString ("Unknow pfrn for file : ").append (_node.FileName));
                         QSqlQuery deleteQuery = QSqlQuery (*m_masterQuery);
                         deleteQuery.prepare (QString ("delete from Master_%1 where frn=?").arg (m_Path));
 
@@ -193,6 +211,5 @@ void PathGen::run()
     m_pathQuery->exec ();
     Log::v (QString ("Generate Path for volume[%1:\\] successed.").arg (m_Path));
 }
-
 #pragma endregion PathGen
 ///:~
