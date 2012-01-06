@@ -202,7 +202,14 @@ void Log::e (wchar_t * format, ...)
 }
 void Log::TimerBegin()
 {
+#ifdef _DEBUG
     _timerBegin.start();
+#else
+
+    if (_enable)
+        _timerBegin.start();
+
+#endif
 }
 void Log::TimerEnd (QString info)
 {
@@ -213,8 +220,7 @@ void Log::TimerEnd (QString info)
     if (!_enable)
         return;
 
-    QTime _timeLength (0, 0, 0);
-    _timeLength.addMSecs (_timerBegin.elapsed());
+    QTime _timeLength = QTime (0, 0, 0).addMSecs (_timerBegin.elapsed());
     QDateTime now = QDateTime::currentDateTime();
     synchronized (_logMutex)
     {
@@ -234,9 +240,7 @@ void Log::TimerEnd (QString info)
 void Log::TimerEnd (std::wstring info)
 {
 #ifdef _DEBUG
-    QTime _timeLength (0, 0, 0);
-    _timeLength.addMSecs (_timerBegin.elapsed());
-    info = L"[time]" + info + L" " + _timeLength.toString ("H:m:ss zzz").toStdWString() + L"\n";
+    info = L"[timer]" + info + L" " + QTime (0, 0, 0).addMSecs (_timerBegin.elapsed()).toString ("H:m:ss zzz").toStdWString() + L"\n";
     OutputDebugStringW (info.c_str());
 #else
     TimerEnd (QString::fromStdWString (info));
