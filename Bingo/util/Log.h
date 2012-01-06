@@ -20,6 +20,7 @@
 
 #include <string>
 #include <QString>
+#include <QTime>
 #include "../core/ThreadSync.h"
 
 class Log
@@ -41,10 +42,16 @@ public:
     static void v (wchar_t * format, ...);
     static void w (wchar_t * format, ...);
     static void e (wchar_t * format, ...);
+    static void TimerBegin();
+    static void TimerEnd (QString info);
+    static void TimerEnd (std::wstring info);
+    static void TimerEnd (const char* info);
+    static void TimerEnd (wchar_t * format, ...);
 private:
     static bool _enable;
     static QString _logfile;
     static Mutex _logMutex;
+	static QTime _timerBegin;
 };
 
 #endif

@@ -26,6 +26,7 @@ VolInfoMgr *data_VolInfos;
 VolHandleMgr *data_VolHandles;
 ConfigDB *data_configDB;
 MasterDB *data_masterDB;
+PathDB *data_pathDB;
 Language *uidata_Lang;
 
 void InitGlobalData()
@@ -40,6 +41,7 @@ void DestroyGlobalData()
 {
     delete data_coreMgr;
 	delete data_masterDB;
+	delete data_pathDB;
     delete data_configDB;
     delete NTFS::data_volNTFSInfoCache;
     delete data_VolInfos;

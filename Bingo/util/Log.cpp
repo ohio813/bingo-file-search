@@ -28,6 +28,7 @@ using namespace std;
 bool Log::_enable = false;
 QString Log::_logfile = ".log";
 Mutex Log::_logMutex = Mutex();
+QTime Log::_timerBegin = QTime();
 
 void Log::enable()
 {
@@ -197,6 +198,65 @@ void Log::e (wchar_t * format, ...)
     e (wstring (log));
 #else
     e (QString::fromStdWString (log));
+#endif
+}
+void Log::TimerBegin()
+{
+    _timerBegin.start();
+}
+void Log::TimerEnd (QString info)
+{
+#ifdef _DEBUG
+    TimerEnd (info.toStdWString());
+#else
+
+    if (!_enable)
+        return;
+
+    QTime _timeLength (0, 0, 0);
+    _timeLength.addMSecs (_timerBegin.elapsed());
+    QDateTime now = QDateTime::currentDateTime();
+    synchronized (_logMutex)
+    {
+        QFile file (_logfile);
+
+        if (file.open (QIODevice::Append | QIODevice::WriteOnly))
+        {
+            QTextStream stream (&file);
+            stream << "timer|" << now.toString() << "|" << info << " " << _timeLength.toString ("H:m:ss zzz") << endl;
+            stream.flush();
+        }
+
+        file.close();
+    }
+#endif
+}
+void Log::TimerEnd (std::wstring info)
+{
+#ifdef _DEBUG
+    QTime _timeLength (0, 0, 0);
+    _timeLength.addMSecs (_timerBegin.elapsed());
+    info = L"[time]" + info + L" " + _timeLength.toString ("H:m:ss zzz").toStdWString() + L"\n";
+    OutputDebugStringW (info.c_str());
+#else
+    TimerEnd (QString::fromStdWString (info));
+#endif
+}
+void Log::TimerEnd (const char* info)
+{
+    TimerEnd (QString (info));
+}
+void Log::TimerEnd (wchar_t * format, ...)
+{
+    wchar_t info[512] = {0};
+    va_list args;
+    va_start (args,  format);
+    _vswprintf (info, format, args);
+    va_end (args);
+#ifdef _DEBUG
+    TimerEnd (wstring (info));
+#else
+    TimerEnd (QString::fromStdWString (info));
 #endif
 }
 ///:~
