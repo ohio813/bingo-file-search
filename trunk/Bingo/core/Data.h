@@ -23,6 +23,7 @@
 #include "Memory.h"
 #include "../util/ConfigDB.h"
 #include "../util/MasterDB.h"
+#include "../util/PathDB.h"
 #include "../ui/Language.h"
 
 // link the global data.
@@ -32,6 +33,7 @@ extern VolInfoMgr *data_VolInfos;
 extern VolHandleMgr *data_VolHandles;
 extern ConfigDB *data_configDB;
 extern MasterDB *data_masterDB;
+extern PathDB *data_pathDB;
 extern Language *uidata_Lang;
 
 // global data associated function

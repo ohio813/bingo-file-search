@@ -42,6 +42,7 @@ void VolUSN::StartUp()
 {
     data_VolHandles->open (m_Path);
     m_hVol = (*data_VolHandles) [m_Path];
+    data_pathDB->CreateTable (WChartoCharLetter (m_Path));
     bool jumpCreate = false;
 
     if (QueryUSN())
@@ -131,6 +132,7 @@ void VolUSN::Exit()
 
     data_configDB->m_LastRecord.insert (WChartoCharLetter (m_Path),
                                         ConfigDBLastRecordTableNode (m_UsnInfo.UsnJournalID, m_UsnInfo.NextUsn));
+    data_pathDB->DropTable (WChartoCharLetter (m_Path));
     data_VolHandles->close (m_Path);
 }
 void VolUSN::Disable()
@@ -149,6 +151,7 @@ void VolUSN::Disable()
         data_configDB->m_LastRecord.erase (ptr);
 
     data_masterDB->DropTable (m_Path);
+    data_pathDB->DropTable (WChartoCharLetter (m_Path));
     data_VolHandles->close (m_Path);
 }
 bool VolUSN::isActive()
