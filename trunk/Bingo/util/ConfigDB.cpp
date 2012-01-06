@@ -82,8 +82,8 @@ void ConfigDB::ReadTable (int i)
 
             while (m_query.next())
                 m_LastRecord.insert (m_query.value (0).toString() [0].toAscii(),
-                                     ConfigDBLastRecordTableNode ( (unsigned __int64) m_query.value (1).toLongLong(),
-                                             (unsigned __int64) m_query.value (2).toLongLong()));
+                                     ConfigDBLastRecordTableNode ( (unsigned __int64) m_query.value (1).toULongLong(),
+                                             (unsigned __int64) m_query.value (2).toULongLong()));
 
             break;
 
@@ -119,8 +119,8 @@ void ConfigDB::WriteTable ()
             ptr != m_LastRecord.end(); ++ptr)
     {
         m_query.bindValue (0, QChar (ptr.key()));
-        m_query.bindValue (1, qlonglong (ptr.value().UsnJournalID));
-        m_query.bindValue (2, qlonglong (ptr.value().NextUsn));
+        m_query.bindValue (1, qulonglong (ptr.value().UsnJournalID));
+        m_query.bindValue (2, qulonglong (ptr.value().NextUsn));
         m_query.exec();
     }
 

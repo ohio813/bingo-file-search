@@ -25,6 +25,7 @@ MemoryPool *data_MemPool;
 VolInfoMgr *data_VolInfos;
 VolHandleMgr *data_VolHandles;
 ConfigDB *data_configDB;
+MasterDB *data_masterDB;
 Language *uidata_Lang;
 
 void InitGlobalData()
@@ -38,6 +39,7 @@ void InitGlobalData()
 void DestroyGlobalData()
 {
     delete data_coreMgr;
+	delete data_masterDB;
     delete data_configDB;
     delete NTFS::data_volNTFSInfoCache;
     delete data_VolInfos;
