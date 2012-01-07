@@ -176,6 +176,10 @@ void MasterDB::ReadLastUSNDel (char Path, unsigned __int64 frn)
     delQuery.bindValue (0, qulonglong (frn));
     delQuery.exec();
 }
+QStringList MasterDB::getAllTables()
+{
+    return m_db.tables();
+}
 QSqlQuery* MasterDB::copyRootQuery()
 {
     return new QSqlQuery (m_db);

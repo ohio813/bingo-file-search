@@ -24,7 +24,7 @@
 #include "../core/ThreadSync.h"
 #include "LRUCache.hpp"
 
-class PathDB
+class PathDB : public ReadWriteSync
 {
 public:
     PathDB();

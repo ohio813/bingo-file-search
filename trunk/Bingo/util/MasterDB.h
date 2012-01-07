@@ -22,8 +22,9 @@
 #include <string>
 #include <Windows.h>
 #include "../core/File.h"
+#include "../core/ThreadSync.h"
 
-class MasterDB
+class MasterDB : public ReadWriteSync
 {
 public:
     MasterDB();
@@ -35,6 +36,7 @@ public:
     void EnumInsert (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
                      DWORD attrib, DWORD size, TIME32 createTime, TIME32 writeTime);
     void ReadLastUSNDel (char Path, unsigned __int64 frn);
+	QStringList getAllTables();
     QSqlQuery* copyRootQuery();
 private:
     QSqlDatabase m_db;

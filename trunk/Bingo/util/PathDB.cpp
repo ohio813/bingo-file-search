@@ -108,9 +108,8 @@ void PathGen::run()
             continue;
         }
 
+        assert (_nodeStack.empty());
         _nodeStack.push (_node);
-        _findIndexQuery.finish();
-        _findPathQuery.finish();
 
         while (true)
         {
@@ -134,7 +133,7 @@ void PathGen::run()
                     QByteArray tmppath =  _findPathQuery.value (0).toByteArray();
                     _findPathQuery.finish();
 
-                    if (_nodeStack.size() > 2)
+                    if (_nodeStack.size() > 1)
                     {
                         do
                         {
@@ -145,25 +144,12 @@ void PathGen::run()
                             m_pathQuery->exec();
                             m_pathQuery->finish();
                         }
-                        while (_nodeStack.size() > 2);
+                        while (_nodeStack.size() > 1);
 
                         _cache.put (_node.FRN, tmppath);
-                        goto Flag;
                     }
                     else
-                    {
-                        while (_nodeStack.size() > 1)
-                        {
-Flag:
-                            _node = _nodeStack.pop();
-                            m_pathQuery->bindValue (0, _node.FRN);
-                            tmppath += ("\\" + _node.FileName);
-                            _cache.put (_node.FRN, tmppath);
-                            m_pathQuery->bindValue (1, tmppath);
-                            m_pathQuery->exec();
-                            m_pathQuery->finish();
-                        }
-                    }
+                        _cache.put (_node.PFRN, tmppath);
 
                     _node = _nodeStack.pop();
                     m_pathQuery->bindValue (0, _node.FRN);
