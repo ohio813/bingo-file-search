@@ -33,22 +33,22 @@ Language *uidata_Lang;
 void InitGlobalData()
 {
     data_MemPool = new MemoryPool();
-    uidata_Lang = new Language();
-    data_VolHandles = new VolHandleMgr();
-    NTFS::data_volNTFSInfoCache = new NTFS::VolNTFSInfoCache();
-    data_coreMgr = new CoreMgr();
+    uidata_Lang = data_MemPool->mallocClass<Language>();
+    data_VolHandles = data_MemPool->mallocClass<VolHandleMgr>();
+    NTFS::data_volNTFSInfoCache = data_MemPool->mallocClass<NTFS::VolNTFSInfoCache>();
+    data_coreMgr = data_MemPool->mallocClass<CoreMgr>();
 }
 void DestroyGlobalData()
 {
-    delete data_coreMgr;
-	delete data_Moniter;
-	delete data_masterDB;
-	delete data_pathDB;
-    delete data_configDB;
-    delete NTFS::data_volNTFSInfoCache;
-    delete data_VolInfos;
-    delete data_VolHandles;
-    delete uidata_Lang;
+    data_MemPool->freeClass (data_coreMgr);
+    data_MemPool->freeClass (data_Moniter);
+    data_MemPool->freeClass (data_masterDB);
+    data_MemPool->freeClass (data_pathDB);
+    data_MemPool->freeClass (data_configDB);
+    data_MemPool->freeClass (NTFS::data_volNTFSInfoCache);
+    data_MemPool->freeClass (data_VolInfos);
+    data_MemPool->freeClass (data_VolHandles);
+    data_MemPool->freeClass (uidata_Lang);
     delete data_MemPool;
 }
 

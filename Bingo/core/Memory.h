@@ -21,6 +21,8 @@
 #include <Windows.h>
 #include <string>
 #include <list>
+#include <assert.h>
+#include <new>
 
 void DumpBin (void* pSrc, size_t Size, std::wstring fileName);
 void DumpTxt (void* pSrc, size_t Size, std::wstring fileName);
@@ -63,8 +65,16 @@ public:
     MemoryPool();
     ~MemoryPool();
     void* malloc (size_t Size);
+    template<class T>
+    T* mallocClass ();
+    template<class T>
+    T* mallocClassArray (int length);
     void* realloc (void* pSrc, size_t Size);
     void free (void* pSrc);
+    template<class T>
+    void freeClass (T *pSrc);
+    template<class T>
+    void freeClassArray (T *pSrc);
     bool isValidPointer (void* pSrc) ;
     void gc();
     void DumpPoolBin (std::wstring fileName);
@@ -89,5 +99,42 @@ private:
     size_t m_freePoolSize;
 };
 
+template<class T>
+T* MemoryPool::mallocClass ()
+{
+    T* p = (T*) MemoryPool::malloc (sizeof (T));
+    new (p) T;
+    return p;
+}
+
+template<class T>
+void MemoryPool::freeClass (T *pSrc)
+{
+    pSrc->~T();
+    MemoryPool::free (pSrc);
+}
+
+template<class T>
+T* MemoryPool::mallocClassArray (int length)
+{
+    assert (length > 0);
+    unsigned char* p = (unsigned char*) MemoryPool::malloc (sizeof (T) * length + sizeof (int));
+    new (p) T[length];
+    p += sizeof (int);
+    return (T*) p;
+}
+
+template<class T>
+void MemoryPool::freeClassArray (T *pSrc)
+{
+    unsigned char* p = (unsigned char*) pSrc;
+    p -= sizeof (int);
+    int length = * (int*) p;
+
+    while (length)
+        pSrc[--length].~T();
+
+    MemoryPool::free (p);
+}
 #endif
 ///:~

@@ -87,10 +87,14 @@ void PathGen::run()
     _findIndexQuery = QSqlQuery (*m_masterQuery);
     _findPathQuery = QSqlQuery (*m_pathQuery);
     _existPathQuery = QSqlQuery (*m_pathQuery);
+	_findIndexQuery.setForwardOnly(true);
     _findIndexQuery.prepare (QString ("select frn,pfrn,name from Master_%1 where frn=?").arg (m_Path));
+	_findPathQuery.setForwardOnly(true);
     _findPathQuery.prepare (QString ("select path from Path_%1 where frn=?").arg (m_Path));
+	_existPathQuery.setForwardOnly(true);
     _existPathQuery.prepare (QString ("select 1 where exists(select 1 from Path_%1 where frn=?)").arg (m_Path));
     m_pathQuery->prepare (QString ("insert into Path_%1 values (?,?) ").arg (m_Path));
+	m_masterQuery->setForwardOnly(true);
     m_masterQuery->exec (QString ("select frn,pfrn,name from Master_%1").arg (m_Path));
 
     while (m_masterQuery->next())
