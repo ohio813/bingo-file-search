@@ -75,11 +75,11 @@ private:
     int m_ReadCount;
 };
 
-class MutilProcessorThread
+class MultiProcessorThread
 {
 public:
-    MutilProcessorThread();
-    ~MutilProcessorThread();
+    MultiProcessorThread();
+    ~MultiProcessorThread();
     virtual void run();
     bool start();
     void suspend();

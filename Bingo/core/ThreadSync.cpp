@@ -122,25 +122,25 @@ void ReadWriteSync::endwrite()
     m_WriteLock.unlock();
 }
 
-DWORD_PTR MutilProcessorThread::ProcessorCount = GetNumCPUs();
-DWORD_PTR MutilProcessorThread::RunningThreadCount = 0;
-Mutex MutilProcessorThread::RunningThreadCountMutex = Mutex();
-DWORD_PTR MutilProcessorThread::GetNumCPUs()
+DWORD_PTR MultiProcessorThread::ProcessorCount = GetNumCPUs();
+DWORD_PTR MultiProcessorThread::RunningThreadCount = 0;
+Mutex MultiProcessorThread::RunningThreadCountMutex = Mutex();
+DWORD_PTR MultiProcessorThread::GetNumCPUs()
 {
     SYSTEM_INFO m_si = {0};
     GetSystemInfo (&m_si);
     return (DWORD_PTR) m_si.dwNumberOfProcessors;
 }
-DWORD WINAPI MutilProcessorThread::ThreadFunc (LPVOID in)
+DWORD WINAPI MultiProcessorThread::ThreadFunc (LPVOID in)
 {
-    static_cast<MutilProcessorThread*> (in)->run();
+    static_cast<MultiProcessorThread*> (in)->run();
     synchronized (RunningThreadCountMutex)
     {
         RunningThreadCount--;
     }
     return 0;
 }
-DWORD_PTR MutilProcessorThread::getRunningThreadCount()
+DWORD_PTR MultiProcessorThread::getRunningThreadCount()
 {
     DWORD_PTR ret;
     synchronized (RunningThreadCountMutex)
@@ -149,20 +149,20 @@ DWORD_PTR MutilProcessorThread::getRunningThreadCount()
     }
     return ret;
 }
-DWORD_PTR MutilProcessorThread::getProcessorCount()
+DWORD_PTR MultiProcessorThread::getProcessorCount()
 {
     return ProcessorCount;
 }
-MutilProcessorThread::MutilProcessorThread() : m_hThread (INVALID_HANDLE_VALUE), m_ProcessorMask (1) {}
-MutilProcessorThread::~MutilProcessorThread()
+MultiProcessorThread::MultiProcessorThread() : m_hThread (INVALID_HANDLE_VALUE), m_ProcessorMask (1) {}
+MultiProcessorThread::~MultiProcessorThread()
 {
     if (m_hThread != INVALID_HANDLE_VALUE)
         CloseHandle (m_hThread);
 }
-void MutilProcessorThread::run() {}
-bool MutilProcessorThread::start()
+void MultiProcessorThread::run() {}
+bool MultiProcessorThread::start()
 {
-    m_hThread = CreateThread (NULL, 0, MutilProcessorThread::ThreadFunc, this, CREATE_SUSPENDED, NULL);
+    m_hThread = CreateThread (NULL, 0, MultiProcessorThread::ThreadFunc, this, CREATE_SUSPENDED, NULL);
 
     if (m_hThread != INVALID_HANDLE_VALUE)
     {
@@ -178,29 +178,29 @@ bool MutilProcessorThread::start()
     else
         return false;
 }
-void MutilProcessorThread::suspend()
+void MultiProcessorThread::suspend()
 {
     if (m_hThread != INVALID_HANDLE_VALUE)
         SuspendThread (m_hThread);
 }
-void MutilProcessorThread::resume()
+void MultiProcessorThread::resume()
 {
     if (m_hThread != INVALID_HANDLE_VALUE)
         ResumeThread (m_hThread);
 }
-void MutilProcessorThread::wait()
+void MultiProcessorThread::wait()
 {
     if (m_hThread != INVALID_HANDLE_VALUE)
         WaitForSingleObject (m_hThread, INFINITE);
 }
-DWORD MutilProcessorThread::wait (DWORD timeout)
+DWORD MultiProcessorThread::wait (DWORD timeout)
 {
     if (m_hThread != INVALID_HANDLE_VALUE)
         return WaitForSingleObject (m_hThread, timeout);
     else
         return WAIT_FAILED;
 }
-void MutilProcessorThread::terminate()
+void MultiProcessorThread::terminate()
 {
     if (m_hThread != INVALID_HANDLE_VALUE)
     {
@@ -223,11 +223,11 @@ void MutilProcessorThread::terminate()
         }
     }
 }
-HANDLE MutilProcessorThread::getHandle()
+HANDLE MultiProcessorThread::getHandle()
 {
     return m_hThread;
 }
-DWORD_PTR MutilProcessorThread::getProcessorMask()
+DWORD_PTR MultiProcessorThread::getProcessorMask()
 {
     return m_ProcessorMask;
 }
