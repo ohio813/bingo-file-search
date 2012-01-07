@@ -66,6 +66,7 @@ class Moniter : public QThread
 {
     Q_OBJECT
 public:
+	void run();
     friend void MoniterAdd (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
                             DWORD attrib);
     friend void MoniterDel (char Path, unsigned __int64 frn);

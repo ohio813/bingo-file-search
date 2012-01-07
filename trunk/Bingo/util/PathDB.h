@@ -38,7 +38,7 @@ private:
     QSqlQuery m_query;
 };
 
-class PathGen : public MutilProcessorThread
+class PathGen : public MultiProcessorThread
 {
     typedef struct _Node
     {

@@ -62,4 +62,6 @@ void MoniterUpdate (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std:
     else
         data_Moniter->m_queue.put (MoniterNode (MTUPDATE, Path, frn, pfrn, utf8name, attrib));
 }
+
+void Moniter::run(){}
 ///:~
