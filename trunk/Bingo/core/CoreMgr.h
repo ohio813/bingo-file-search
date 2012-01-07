@@ -19,6 +19,9 @@
 #define COREMGR_H
 
 #include <QtCore>
+#include <QMap>
+#include "VolumeMgr.h"
+#include "USN.h"
 
 class CoreMgr: public QThread
 {
@@ -29,8 +32,12 @@ public:
     void run();
 signals:
     void explains();
+    void appInitStart();
+    void appInitProgress (int percent, QString detail);
+    void appInitEnd();
 public slots:
 private:
+    QMap<char, VolUSN*> m_VolUsns;
 };
 
 #endif
