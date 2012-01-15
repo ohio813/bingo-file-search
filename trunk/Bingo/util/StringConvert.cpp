@@ -33,7 +33,7 @@ std::wstring ASCII2Unicode (const char* buf)
     //return std::wstring (unicode.begin(), unicode.end());
     std::wstring ret (unicode, unicode + len * sizeof (wchar_t));
     data_MemPool->free (unicode);
-    return ret;
+    return std::move (ret);
 }
 std::string Unicode2ASCII (const wchar_t* buf)
 {
@@ -44,7 +44,7 @@ std::string Unicode2ASCII (const wchar_t* buf)
     //return std::string (ascii.begin(), ascii.end());
     std::string ret (ascii, ascii + len * sizeof (char));
     data_MemPool->free (ascii);
-    return ret;
+    return std::move (ret);
 }
 std::wstring UTF2Unicode (const char* buf)
 {
@@ -55,7 +55,7 @@ std::wstring UTF2Unicode (const char* buf)
     //return std::wstring (unicode.begin(), unicode.end());
     std::wstring ret (unicode, unicode + len * sizeof (wchar_t));
     data_MemPool->free (unicode);
-    return ret;
+    return std::move (ret);
 }
 std::string Unicode2UTF (const wchar_t* buf)
 {
@@ -66,32 +66,32 @@ std::string Unicode2UTF (const wchar_t* buf)
     //return std::string (utf8.begin(), utf8.end());
     std::string ret (utf8, utf8 + len * sizeof (char));
     data_MemPool->free (utf8);
-    return ret;
+    return std::move (ret);
 }
 
-extern std::string _2string (std::wstring input)
+extern std::string _2string (const std::wstring &input)
 {
     return Unicode2ASCII (input.c_str());
 }
-extern std::string _utf2string (std::string utf8_input)
+extern std::string _utf2string (const std::string &utf8_input)
 {
     return Unicode2ASCII (UTF2Unicode (utf8_input.c_str()).c_str());
 }
 
-extern std::wstring _2wstring (std::string input)
+extern std::wstring _2wstring (const std::string &input)
 {
     return ASCII2Unicode (input.c_str());
 }
-extern std::wstring _utf2wstring (std::string utf8_input)
+extern std::wstring _utf2wstring (const std::string &utf8_input)
 {
     return UTF2Unicode (utf8_input.c_str());
 }
 
-extern std::string _2utf8 (std::wstring input)
+extern std::string _2utf8 (const std::wstring &input)
 {
     return Unicode2UTF (input.c_str());
 }
-extern std::string _2utf8 (std::string input)
+extern std::string _2utf8 (const std::string &input)
 {
     return Unicode2UTF (ASCII2Unicode (input.c_str()).c_str());
 }

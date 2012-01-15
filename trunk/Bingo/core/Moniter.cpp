@@ -23,8 +23,8 @@
 #include "VolumeLetter.h"
 
 
-void ReadLastUSNAddORUpdate (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                             DWORD attrib)
+void ReadLastUSNAddORUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                             const DWORD& attrib)
 {
     unsigned __int64 size = 0;
     FILETIME createTime, writeTime;
@@ -41,21 +41,21 @@ void ReadLastUSNAddORUpdate (char Path, unsigned __int64 frn, unsigned __int64 p
     else
         data_masterDB->EnumInsert (Path, frn , pfrn, utf8name, attrib, 0, 0, 0);
 }
-void ReadLastUSNDel (char Path, unsigned __int64 frn)
+void ReadLastUSNDel (const char& Path, const unsigned __int64& frn)
 {
     data_masterDB->ReadLastUSNDel (Path, frn);
 }
-void MoniterAdd (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                 DWORD attrib)
+void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                 const DWORD& attrib)
 {
     data_Moniter->m_queue.put (MoniterNode (MTADD, Path, frn, pfrn, utf8name, attrib));
 }
-void MoniterDel (char Path, unsigned __int64 frn)
+void MoniterDel (const char& Path, const unsigned __int64& frn)
 {
     data_Moniter->m_queue.put (MoniterNode (MTDEL, Path, frn, 0, "", 0));
 }
-void MoniterUpdate (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                    DWORD attrib)
+void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                    const DWORD& attrib)
 {
     if (attrib & FILE_ATTRIBUTE_DIRECTORY)
         data_Moniter->m_queue.put (MoniterNode (MTUPDATEDIR, Path, frn, pfrn, utf8name, attrib));
@@ -63,5 +63,5 @@ void MoniterUpdate (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std:
         data_Moniter->m_queue.put (MoniterNode (MTUPDATE, Path, frn, pfrn, utf8name, attrib));
 }
 
-void Moniter::run(){}
+void Moniter::run() {}
 ///:~

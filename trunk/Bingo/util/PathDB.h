@@ -60,16 +60,7 @@ class PathGen : public MultiProcessorThread
     } _Node;
 public:
     PathGen() : _cache (16) {}
-    ~PathGen()
-    {
-        _findPathQuery.clear();
-        _findIndexQuery.clear();
-        _existPathQuery.clear();
-        m_masterQuery->clear();
-        m_pathQuery->clear();
-        delete m_masterQuery;
-        delete m_pathQuery;
-    }
+    ~PathGen();    
     void setMasterQuery (QSqlQuery* masterQuery);
     void setPathQuery (QSqlQuery* pathQuery);
     void setPath (char path);

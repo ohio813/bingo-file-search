@@ -20,6 +20,7 @@
 #include <Qt>
 #include <QtCore>
 #include "Log.h"
+#include "../core/Data.h"
 
 bool SqlMemoryDBLoadorSave (QSqlDatabase& memdb, QSqlDatabase& filedb, bool load)
 {
@@ -149,8 +150,8 @@ void MasterDB::DropTable (char Path)
     m_query.exec ("VACUUM;");
     Log::v (QString ("Drop table Master_%1").arg (Path));
 }
-void MasterDB::EnumInsert (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                           DWORD attrib, DWORD size, TIME32 createTime, TIME32 writeTime)
+void MasterDB::EnumInsert (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                           const DWORD& attrib, const DWORD& size, const TIME32& createTime, const TIME32& writeTime)
 {
     static char lastPath = 0;
 
@@ -182,6 +183,6 @@ QStringList MasterDB::getAllTables()
 }
 QSqlQuery* MasterDB::copyRootQuery()
 {
-    return new QSqlQuery (m_db);
+    return data_MemPool->mallocClass<QSqlQuery, QSqlDatabase> (m_db);
 }
 ///:~

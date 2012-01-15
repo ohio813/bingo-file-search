@@ -63,7 +63,7 @@ void VolUSN::StartUp()
             goto NewStart;
         }
 
-        if (ptr.value().UsnJournalID != m_UsnInfo.UsnJournalID)
+        if (ptr.value().UsnJournalID != m_UsnInfo.UsnJournalID || ptr.value().NextUsn < m_UsnInfo.FirstUsn)
         {
             data_masterDB->DeleteTable (m_Path);
             goto NewStart;
@@ -82,7 +82,7 @@ NewStart:
         if (jumpCreate)
         {
             if (m_UsnInfo.FirstUsn == 0)
-                goto JmupCreate;
+                goto JumpCreate;
             else
                 DeleteUSN();
         }
@@ -111,7 +111,7 @@ NewStart:
             return;
         }
 
-JmupCreate:
+JumpCreate:
         synchronized (m_isActive_Mutex)
         {
             m_isActive = true;

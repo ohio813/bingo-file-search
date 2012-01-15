@@ -33,10 +33,10 @@ public:
     void CreateTable (char Path);
     void DeleteTable (char Path);
     void DropTable (char Path);
-    void EnumInsert (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                     DWORD attrib, DWORD size, TIME32 createTime, TIME32 writeTime);
+    void EnumInsert (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                     const DWORD& attrib, const DWORD& size, const TIME32& createTime, const TIME32& writeTime);
     void ReadLastUSNDel (char Path, unsigned __int64 frn);
-	QStringList getAllTables();
+    QStringList getAllTables();
     QSqlQuery* copyRootQuery();
 private:
     QSqlDatabase m_db;
