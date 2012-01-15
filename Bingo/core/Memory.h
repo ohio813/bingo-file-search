@@ -67,6 +67,17 @@ public:
     void* malloc (size_t Size);
     template<class T>
     T* mallocClass ();
+#ifdef _MSC_VER
+    template<class T, class Arg0>
+    T* mallocClass (Arg0& arg0);
+    template<class T, class Arg0, class Arg1>
+    T* mallocClass (Arg0& arg0, Arg1& arg1);
+    template<class T, class Arg0, class Arg1, class Arg2>
+    T* mallocClass (Arg0& arg0, Arg1& arg1, Arg2& arg2);
+#else// Currently not supported in VC but supported in GCC
+    template<class T, class... Args>
+    T* mallocClass (Args && ... args);
+#endif
     template<class T>
     T* mallocClassArray (int length);
     void* realloc (void* pSrc, size_t Size);
@@ -106,6 +117,38 @@ T* MemoryPool::mallocClass ()
     new (p) T;
     return p;
 }
+
+#ifdef _MSC_VER
+template<class T, class Arg0>
+T* MemoryPool::mallocClass (Arg0& arg0)
+{
+    T* p = (T*) MemoryPool::malloc (sizeof (T));
+    new (p) T (arg0);
+    return p;
+}
+template<class T, class Arg0, class Arg1>
+T* MemoryPool::mallocClass (Arg0& arg0, Arg1& arg1)
+{
+    T* p = (T*) MemoryPool::malloc (sizeof (T));
+    new (p) T (arg0, arg1);
+    return p;
+}
+template<class T, class Arg0, class Arg1, class Arg2>
+T* MemoryPool::mallocClass (Arg0& arg0, Arg1& arg1, Arg2& arg2)
+{
+    T* p = (T*) MemoryPool::malloc (sizeof (T));
+    new (p) T (arg0, arg1, arg2);
+    return p;
+}
+#else// Currently not supported in VC but supported in GCC
+template<class T, class... Args>
+T* MemoryPool::mallocClass (Args && ... args)
+{
+    T* p = (T*) MemoryPool::malloc (sizeof (T));
+    new (p) T (std::forward<Args> (args)...);
+    return p;
+}
+#endif
 
 template<class T>
 void MemoryPool::freeClass (T *pSrc)

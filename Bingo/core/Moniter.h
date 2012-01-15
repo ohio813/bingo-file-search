@@ -22,20 +22,20 @@
 #include <Windows.h>
 #include "../util/BlockingQueue.hpp"
 
-typedef void (*MoniterAddPtr) (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                               DWORD attrib);
-typedef void (*MoniterDelPtr) (char Path, unsigned __int64 frn);
-typedef void (*MoniterUpdatePtr) (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                                  DWORD attrib);
+typedef void (*MoniterAddPtr) (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                               const DWORD& attrib);
+typedef void (*MoniterDelPtr) (const char& Path, const unsigned __int64& frn);
+typedef void (*MoniterUpdatePtr) (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                                  const DWORD& attrib);
 
-void ReadLastUSNAddORUpdate (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                             DWORD attrib);
-void ReadLastUSNDel (char Path, unsigned __int64 frn);
-void MoniterAdd (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                 DWORD attrib);
-void MoniterDel (char Path, unsigned __int64 frn);
-void MoniterUpdate (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                    DWORD attrib);
+void ReadLastUSNAddORUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                             const DWORD& attrib);
+void ReadLastUSNDel (const char& Path, const unsigned __int64& frn);
+void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                 const DWORD& attrib);
+void MoniterDel (const char& Path, const unsigned __int64& frn);
+void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                    const DWORD& attrib);
 
 enum MoniterType {MTADD, MTDEL, MTUPDATE, MTUPDATEDIR};
 
@@ -66,12 +66,12 @@ class Moniter : public QThread
 {
     Q_OBJECT
 public:
-	void run();
-    friend void MoniterAdd (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                            DWORD attrib);
-    friend void MoniterDel (char Path, unsigned __int64 frn);
-    friend void MoniterUpdate (char Path, unsigned __int64 frn, unsigned __int64 pfrn, std::string utf8name,
-                               DWORD attrib);
+    void run();
+    friend void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                            const DWORD& attrib);
+    friend void MoniterDel (const char& Path, const unsigned __int64& frn);
+    friend void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                               const DWORD& attrib);
 private:
     BlockingQueue<MoniterNode> m_queue;
 };

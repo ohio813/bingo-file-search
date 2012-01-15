@@ -32,11 +32,13 @@ CoreMgr::CoreMgr()
 
 CoreMgr::~CoreMgr()
 {
-    //data_pathDB->DumpDB();
-    foreach (VolUSN * volUSN, m_VolUsns)
+#ifdef _DEBUG
+    data_pathDB->DumpDB();
+#endif
+	foreach (VolUSN * volUSN, m_VolUsns)
     {
         volUSN->Exit();
-        delete volUSN;
+        data_MemPool->freeClass (volUSN);
     }
 }
 
@@ -61,7 +63,7 @@ void CoreMgr::run()
 
             if (!data_configDB->m_Disable.contains (Path))
             {
-                VolUSN *volUSN = new VolUSN (ptr->Path);
+                VolUSN *volUSN = data_MemPool->mallocClass<VolUSN, const wchar_t> (ptr->Path);
                 m_VolUsns.insert (Path, volUSN);
                 volUSN->StartUp();
                 PathGen *pathGen = data_MemPool->mallocClass<PathGen>();
@@ -94,6 +96,7 @@ void CoreMgr::run()
     WaitForMultipleObjects (pathGenVector.size(), hPathGen, true, INFINITE);
     data_MemPool->free (hPathGen);
     foreach (PathGen * pathGen, pathGenVector) data_MemPool->freeClass (pathGen);
+    data_MemPool->gc();
     Log::TimerEnd ("Boot Time:");
     emit appInitEnd();
 }

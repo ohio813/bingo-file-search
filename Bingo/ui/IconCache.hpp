@@ -24,6 +24,7 @@
 #include <QHash>
 #include <Windows.h>
 #include <Shellapi.h>
+#include "../core/Memory.h"
 #pragma comment(lib,"Shell32.lib")
 
 class IconCache
@@ -35,11 +36,11 @@ public:
     }
     ~IconCache()
     {
-        delete m_folderIcon;
+        m_data->freeClass(m_folderIcon);
 
         for (QHash<QString, QIcon*>::iterator ptr = m_fileExtIconMap.begin();
                 ptr != m_fileExtIconMap.end(); ++ptr)
-            delete ptr.value();
+            m_data->freeClass(ptr.value());
     }
     QIcon* getIcon (QString fileName, DWORD fileAttrib)
     {
@@ -84,7 +85,7 @@ private:
         SHFILEINFO info;
         SHGetFileInfoW (L"folder", FILE_ATTRIBUTE_DIRECTORY, &info,
                         sizeof (SHFILEINFO), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES);
-        m_folderIcon = new QIcon (QPixmap::fromWinHICON (info.hIcon));
+        m_folderIcon = m_data->mallocClass<QIcon,QPixmap>(QPixmap::fromWinHICON (info.hIcon));
         DestroyIcon (info.hIcon);
     }
     QIcon* getFileIcon (QString fileExt)
@@ -92,13 +93,14 @@ private:
         SHFILEINFO info;
         SHGetFileInfoW (fileExt.toStdWString().c_str(), FILE_ATTRIBUTE_NORMAL, &info,
                         sizeof (SHFILEINFO), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES);
-        QIcon * qicon = new QIcon (QPixmap::fromWinHICON (info.hIcon));
+        QIcon * qicon = m_data->mallocClass<QIcon,QPixmap>(QPixmap::fromWinHICON (info.hIcon));
         DestroyIcon (info.hIcon);
         return qicon;
     }
 private:
     QHash<QString, QIcon*> m_fileExtIconMap;
     QIcon *m_folderIcon;
+	MemoryPool m_data;
 };
 
 #endif
