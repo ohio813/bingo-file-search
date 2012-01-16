@@ -35,7 +35,7 @@ CoreMgr::~CoreMgr()
 #ifdef _DEBUG
     data_pathDB->DumpDB();
 #endif
-	foreach (VolUSN * volUSN, m_VolUsns)
+    foreach (VolUSN * volUSN, m_VolUsns)
     {
         volUSN->Exit();
         data_MemPool->freeClass (volUSN);
@@ -53,6 +53,7 @@ void CoreMgr::run()
     data_pathDB = data_MemPool->mallocClass<PathDB>();
     data_Moniter = data_MemPool->mallocClass<Moniter>();
     QVector<PathGen*> pathGenVector;
+    QSet<char> scanVolSet;
 
     for (std::set<VolInfoNode, std::less<VolInfoNode>>::iterator ptr = data_VolInfos->m_volinfos.begin()
             ; ptr != data_VolInfos->m_volinfos.end(); ++ptr)
@@ -64,13 +65,17 @@ void CoreMgr::run()
             if (!data_configDB->m_Disable.contains (Path))
             {
                 VolUSN *volUSN = data_MemPool->mallocClass<VolUSN, const wchar_t> (ptr->Path);
+
+                if (!volUSN->StartUp())
+                    continue;
+
                 m_VolUsns.insert (Path, volUSN);
-                volUSN->StartUp();
                 PathGen *pathGen = data_MemPool->mallocClass<PathGen>();
                 pathGenVector.push_back (pathGen);
                 pathGen->setPath (Path);
                 pathGen->setMasterQuery (data_masterDB->copyRootQuery());
                 pathGen->setPathQuery (data_pathDB->copyRootQuery());
+                scanVolSet.insert (Path);
             }
         }
     }
@@ -81,10 +86,10 @@ void CoreMgr::run()
     {
         char Path = tablename.at (tablename.length() - 1).toLatin1();
 
-        if (data_configDB->m_Disable.contains (Path))
+        if (!scanVolSet.contains (Path))
             data_masterDB->DropTable (Path);
     }
-    Log::v (L"CoreMgr:clean disable Table finished.");
+    Log::v (L"CoreMgr:clean disable or non-exist vol Table finished.");
     HANDLE *hPathGen = (HANDLE*) data_MemPool->malloc (pathGenVector.size() * sizeof (HANDLE));
     HANDLE *hPathGentmp = hPathGen;
     foreach (PathGen * pathGen, pathGenVector)

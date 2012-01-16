@@ -26,6 +26,7 @@
 using namespace std;
 
 bool Log::_enable = false;
+bool Log::_firstenable = true;
 QString Log::_logfile = ".log";
 Mutex Log::_logMutex = Mutex();
 QTime Log::_timerBegin = QTime();
@@ -33,10 +34,32 @@ QTime Log::_timerBegin = QTime();
 void Log::enable()
 {
     _enable = true;
+
+    if (_firstenable)
+    {
+        atexit (&Log::onQuit);
+        _firstenable = false;
+    }
 }
 void Log::disable()
 {
     _enable = false;
+}
+void Log::onQuit()
+{
+    synchronized (_logMutex)
+    {
+        QFile file (_logfile);
+
+        if (file.open (QIODevice::Append | QIODevice::WriteOnly))
+        {
+            QTextStream stream (&file);
+            stream << "===========================================================================" << endl;
+            stream.flush();
+        }
+
+        file.close();
+    }
 }
 void Log::setlogfile (std::wstring logfile)
 {

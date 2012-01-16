@@ -41,7 +41,7 @@ public:
             return m_data.size();
         }
     }
-    inline void put (T data)
+    inline void put (const T &data)
     {
         synchronized (m_DataMutex)
         {
@@ -58,7 +58,7 @@ public:
             out = m_data.front();
             m_data.pop();
         }
-        return out;
+        return std::move (out);
     }
 private:
     std::queue<T> m_data;
