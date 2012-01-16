@@ -30,16 +30,7 @@ using namespace std;
 #define ENUM_BUF_LEN 32768 + sizeof(USN) //32K Buffer
 #define READ_BUF_LEN 512 + sizeof(USN) //512B Buffer
 
-VolUSN::VolUSN (wchar_t Path)
-{
-    synchronized (m_isActive_Mutex)
-    {
-        m_isActive = false;
-    }
-    m_Path = Path;
-    m_hVol = (*data_VolHandles) [m_Path];
-}
-void VolUSN::StartUp()
+bool VolUSN::StartUp()
 {
     data_VolHandles->open (m_Path);
     m_hVol = (*data_VolHandles) [m_Path];
@@ -69,6 +60,7 @@ void VolUSN::StartUp()
             goto NewStart;
         }
 
+        m_readBuff = (char *) data_MemPool->malloc (READ_BUF_LEN);
         ReadUSN (ptr.value().NextUsn, false);
         Log::v (L"Read Last USN journal of driver[%c:\\] successes.", m_Path);
         m_hMonitor = CreateThread (NULL, 0, ReadUSNThread , this, 0, NULL);
@@ -84,7 +76,10 @@ NewStart:
             if (m_UsnInfo.FirstUsn == 0)
                 goto JumpCreate;
             else
+            {
+                Log::v (L"Delete last time USN journal of driver[%c:\\].", m_Path);
                 DeleteUSN();
+            }
         }
 
         if (CreateUSN())
@@ -92,11 +87,7 @@ NewStart:
         else
         {
             Log::e (L"Create USN journal of driver[%c:\\] fails. error code:%d.", m_Path, ::GetLastError());
-            synchronized (m_isActive_Mutex)
-            {
-                m_isActive = false;
-            }
-            return;
+            return false;
         }
 
         if (QueryUSN())
@@ -104,33 +95,23 @@ NewStart:
         else
         {
             Log::e (L"Query USN journal of driver[%c:\\] fails. error code:%d.", m_Path, ::GetLastError());
-            synchronized (m_isActive_Mutex)
-            {
-                m_isActive = false;
-            }
-            return;
+            return false;
         }
 
 JumpCreate:
-        synchronized (m_isActive_Mutex)
-        {
-            m_isActive = true;
-        }
         EnumUSN();
         Log::v (L"Enum USN journal of driver[%c:\\] successes.", m_Path);
+        m_readBuff = (char *) data_MemPool->malloc (READ_BUF_LEN);
         m_hMonitor = CreateThread (NULL, 0, ReadUSNThread , this, 0, NULL);
     }
+
+    return true;
 }
 void VolUSN::Exit()
 {
-    synchronized (m_isActive_Mutex)
-    {
-        m_isActive = false;
-    }
-
-    if (WaitForSingleObject (m_hMonitor, 2000) == WAIT_TIMEOUT)
-        TerminateThread (m_hMonitor, 0);
-
+    m_mutex.lock();
+    TerminateThread (m_hMonitor, 0);
+    data_MemPool->free (m_readBuff);
     data_configDB->m_LastRecord.insert (WChartoCharLetter (m_Path),
                                         ConfigDBLastRecordTableNode (m_UsnInfo.UsnJournalID, m_UsnInfo.NextUsn));
     data_pathDB->DropTable (WChartoCharLetter (m_Path));
@@ -138,11 +119,9 @@ void VolUSN::Exit()
 }
 void VolUSN::Disable()
 {
-    synchronized (m_isActive_Mutex)
-    {
-        m_isActive = false;
-    }
-    WaitForSingleObject (m_hMonitor, 2000);
+    m_mutex.lock();
+    TerminateThread (m_hMonitor, 0);
+    data_MemPool->free (m_readBuff);
     DeleteUSN();
     data_configDB->m_Disable.insert (WChartoCharLetter (m_Path));
     QMap<char, ConfigDBLastRecordTableNode>::iterator ptr =
@@ -155,14 +134,13 @@ void VolUSN::Disable()
     data_pathDB->DropTable (WChartoCharLetter (m_Path));
     data_VolHandles->close (m_Path);
 }
-bool VolUSN::isActive()
+void VolUSN::PauseMonitor()
 {
-    bool ret;
-    synchronized (m_isActive_Mutex)
-    {
-        ret = m_isActive;
-    }
-    return ret;
+    m_mutex.lock();
+}
+void VolUSN::ResumeMonitor()
+{
+    m_mutex.unlock();
 }
 bool VolUSN::CreateUSN()
 {
@@ -238,29 +216,32 @@ void VolUSN::EnumUSN()
 }
 void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
 {
+    m_mutex.lock();
     READ_USN_JOURNAL_DATA rujd;
     rujd.StartUsn = StartUsn;
     rujd.ReasonMask = 0xffffffff;
     rujd.ReturnOnlyOnClose = true;
     rujd.Timeout = 0;
-    rujd.BytesToWaitFor = 0;
+    rujd.BytesToWaitFor = Monitor ? READ_BUF_LEN : 0;
     rujd.UsnJournalID = m_UsnInfo.UsnJournalID;
-    char* ReadBuff = (char *) data_MemPool->malloc (READ_BUF_LEN);
     DWORD usnDataSize;
     PUSN_RECORD UsnRecord;
     MoniterAddPtr _add = Monitor ? &MoniterAdd : &ReadLastUSNAddORUpdate;
     MoniterDelPtr _del = Monitor ? &MoniterDel : &ReadLastUSNDel;
     MoniterUpdatePtr _update = Monitor ? &MoniterUpdate : &ReadLastUSNAddORUpdate;
     char Path = WChartoCharLetter (m_Path);
+    m_mutex.unlock();
 
     while (DeviceIoControl (m_hVol, FSCTL_READ_USN_JOURNAL, &rujd,
-                            sizeof (rujd), ReadBuff, READ_BUF_LEN, &usnDataSize, NULL) != 0)
+                            sizeof (rujd), m_readBuff, READ_BUF_LEN, &usnDataSize, NULL) != 0)
     {
         DWORD dwRetBytes = usnDataSize - sizeof (USN);
-        UsnRecord = (PUSN_RECORD) ( ( (char*) ReadBuff) + sizeof (USN));
+        UsnRecord = (PUSN_RECORD) ( ( (char*) m_readBuff) + sizeof (USN));
 
         while (dwRetBytes > 0)
         {
+            m_mutex.lock();
+
             if (UsnRecord->Reason & USN_REASON_FILE_CREATE)
             {
                 // File Created
@@ -281,38 +262,19 @@ void VolUSN::ReadUSN (USN StartUsn, bool Monitor)
                 // has been moved to other place. In this case you need change every subfolder file's path in database.
             }
 
+            m_mutex.unlock();
             // next record.
             DWORD recordLen = UsnRecord->RecordLength;
             dwRetBytes -= recordLen;
             UsnRecord = (PUSN_RECORD) ( ( (char*) UsnRecord) + recordLen);
         }
 
-        rujd.StartUsn = * (USN *) ReadBuff;
+        rujd.StartUsn = * (USN *) m_readBuff;
         m_UsnInfo.NextUsn = rujd.StartUsn;
 
-        if (Monitor)
-        {
-            synchronized (m_isActive_Mutex)
-            {
-                if (!m_isActive)
-                {
-                    data_MemPool->free (ReadBuff);
-                    return;
-                }
-            }
-            Sleep (1500);
-        }
-        else
-        {
-            if (dwRetBytes == 0)
-            {
-                data_MemPool->free (ReadBuff);
-                return;
-            }
-        }
+        if (!Monitor && dwRetBytes == 0)
+            return;
     }
-
-    data_MemPool->free (ReadBuff);
 }
 
 DWORD WINAPI ReadUSNThread (LPVOID param)

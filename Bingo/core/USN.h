@@ -28,12 +28,13 @@ DWORD WINAPI ReadUSNThread (LPVOID param);
 class VolUSN
 {
 public:
-    VolUSN (wchar_t Path);
+    VolUSN (wchar_t Path) : m_Path (Path) {}
     ~VolUSN() {}
-    void StartUp();
+    bool StartUp();
     void Exit();
     void Disable();
-    bool isActive();
+    void PauseMonitor();
+    void ResumeMonitor();
     friend DWORD WINAPI ReadUSNThread (LPVOID param);
 private:
     bool CreateUSN();
@@ -46,8 +47,8 @@ private:
     HANDLE m_hVol;
     HANDLE m_hMonitor;
     USN_JOURNAL_DATA m_UsnInfo;
-    bool m_isActive;
-    Mutex m_isActive_Mutex;
+    Mutex m_mutex;
+    char* m_readBuff;
 };
 
 #endif

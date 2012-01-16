@@ -39,7 +39,8 @@ public:
     ConfigDB();
     ~ConfigDB()
     {
-        WriteTable ();
+        if (m_changed)
+            WriteTable ();
     }
     QMap <char, ConfigDBLastRecordTableNode> m_LastRecord;
     QSet <char> m_Disable;
@@ -49,6 +50,7 @@ private:
     void CreateTable (int i);
     QSqlDatabase m_db;
     QSqlQuery m_query;
+    bool m_changed;
 };
 
 #endif

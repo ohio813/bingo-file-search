@@ -28,6 +28,7 @@ class Log
 public:
     static void enable();
     static void disable();
+	static void onQuit();
     static void setlogfile (std::wstring logfile);
     static void setlogfile (QString logfile);
     static void v (std::wstring log);
@@ -49,6 +50,7 @@ public:
     static void TimerEnd (wchar_t * format, ...);
 private:
     static bool _enable;
+	static bool _firstenable;
     static QString _logfile;
     static Mutex _logMutex;
 	static QTime _timerBegin;

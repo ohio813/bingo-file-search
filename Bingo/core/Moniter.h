@@ -28,19 +28,27 @@ typedef void (*MoniterDelPtr) (const char& Path, const unsigned __int64& frn);
 typedef void (*MoniterUpdatePtr) (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
                                   const DWORD& attrib);
 
-void ReadLastUSNAddORUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
-                             const DWORD& attrib);
-void ReadLastUSNDel (const char& Path, const unsigned __int64& frn);
-void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
-                 const DWORD& attrib);
-void MoniterDel (const char& Path, const unsigned __int64& frn);
-void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
-                    const DWORD& attrib);
+inline void ReadLastUSNAddORUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                                    const DWORD& attrib);
+inline void ReadLastUSNDel (const char& Path, const unsigned __int64& frn);
+inline void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                        const DWORD& attrib);
+inline void MoniterDel (const char& Path, const unsigned __int64& frn);
+inline void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                           const DWORD& attrib);
 
 enum MoniterType {MTADD, MTDEL, MTUPDATE, MTUPDATEDIR};
 
 typedef struct MoniterNode
 {
+    MoniterNode ()
+    {
+        type = MTADD;
+        Path = 0;
+        frn = 0;
+        utf8name = "";
+        attrib = 0;
+    }
     MoniterNode (MoniterType _type,
                  char _Path,
                  unsigned __int64 _frn,
@@ -67,6 +75,9 @@ class Moniter : public QThread
     Q_OBJECT
 public:
     void run();
+    void pause();
+    void resume();
+    void terminate();
     friend void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
                             const DWORD& attrib);
     friend void MoniterDel (const char& Path, const unsigned __int64& frn);
@@ -74,6 +85,7 @@ public:
                                const DWORD& attrib);
 private:
     BlockingQueue<MoniterNode> m_queue;
+    Mutex m_mutex;
 };
 
 #endif

@@ -22,6 +22,7 @@
 
 ConfigDB::ConfigDB()
 {
+    m_changed = false;
     m_db = QSqlDatabase::addDatabase ("QSQLITE", "config_db");
     QString db_Path = QCoreApplication::applicationDirPath() + "/Data/";
     m_db.setDatabaseName (db_Path + "config.db");
@@ -70,6 +71,8 @@ void ConfigDB::CreateTable (int i)
             m_query.exec ("create table Disable(Path char(1))");
             break;
     }
+
+    m_changed = true;
 }
 
 
@@ -135,5 +138,6 @@ void ConfigDB::WriteTable ()
     }
     m_db.commit();
     m_db.close();
+    m_changed = false;
 }
 ///:~

@@ -21,10 +21,10 @@
 #include "USN.h"
 #include "File.h"
 #include "VolumeLetter.h"
+#pragma warning (disable : 4630)
 
-
-void ReadLastUSNAddORUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
-                             const DWORD& attrib)
+extern void ReadLastUSNAddORUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                                    const DWORD& attrib)
 {
     unsigned __int64 size = 0;
     FILETIME createTime, writeTime;
@@ -41,21 +41,21 @@ void ReadLastUSNAddORUpdate (const char& Path, const unsigned __int64& frn, cons
     else
         data_masterDB->EnumInsert (Path, frn , pfrn, utf8name, attrib, 0, 0, 0);
 }
-void ReadLastUSNDel (const char& Path, const unsigned __int64& frn)
+extern void ReadLastUSNDel (const char& Path, const unsigned __int64& frn)
 {
     data_masterDB->ReadLastUSNDel (Path, frn);
 }
-void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
-                 const DWORD& attrib)
+extern void MoniterAdd (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                        const DWORD& attrib)
 {
     data_Moniter->m_queue.put (MoniterNode (MTADD, Path, frn, pfrn, utf8name, attrib));
 }
-void MoniterDel (const char& Path, const unsigned __int64& frn)
+extern void MoniterDel (const char& Path, const unsigned __int64& frn)
 {
     data_Moniter->m_queue.put (MoniterNode (MTDEL, Path, frn, 0, "", 0));
 }
-void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
-                    const DWORD& attrib)
+extern void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigned __int64& pfrn, const std::string& utf8name,
+                           const DWORD& attrib)
 {
     if (attrib & FILE_ATTRIBUTE_DIRECTORY)
         data_Moniter->m_queue.put (MoniterNode (MTUPDATEDIR, Path, frn, pfrn, utf8name, attrib));
@@ -63,5 +63,27 @@ void MoniterUpdate (const char& Path, const unsigned __int64& frn, const unsigne
         data_Moniter->m_queue.put (MoniterNode (MTUPDATE, Path, frn, pfrn, utf8name, attrib));
 }
 
-void Moniter::run() {}
+void Moniter::run()
+{
+    while (true)
+    {
+        MoniterNode node = m_queue.take();
+        synchronized (m_mutex)
+        {
+        }
+    }
+}
+void Moniter::pause()
+{
+    m_mutex.lock();
+}
+void Moniter::resume()
+{
+    m_mutex.unlock();
+}
+void Moniter::terminate()
+{
+    m_mutex.lock();
+    QThread::terminate();
+}
 ///:~
