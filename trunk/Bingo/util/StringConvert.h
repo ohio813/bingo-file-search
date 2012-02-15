@@ -70,7 +70,7 @@ inline std::string _utf2string (const std::string &utf8_input);
 template<class T>
 inline std::string _num2string (const T &num_input)
 {
-    return StringConvert::num2string<T> (num_input);
+    return std::move (StringConvert::num2string<T> (num_input));
 }
 
 inline std::wstring _2wstring (const std::string &input);
@@ -78,7 +78,7 @@ inline std::wstring _utf2wstring (const std::string &utf8_input);
 template<class T>
 inline std::wstring _num2wstring (const T &num_input)
 {
-    return StringConvert::num2wstring<T> (num_input);
+    return std::move (StringConvert::num2wstring<T> (num_input));
 }
 
 inline std::string _2utf8 (const std::wstring &input);
@@ -86,7 +86,7 @@ inline std::string _2utf8 (const std::string &input);
 template<class T>
 inline std::string _num2utf8 (const T &num_input)
 {
-    return _2utf8 (StringConvert::num2wstring<T> (num_input));
+    return std::move (_2utf8 (StringConvert::num2wstring<T> (num_input)));
 }
 
 template<class T>

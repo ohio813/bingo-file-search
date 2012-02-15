@@ -71,29 +71,29 @@ std::string Unicode2UTF (const wchar_t* buf)
 
 extern std::string _2string (const std::wstring &input)
 {
-    return Unicode2ASCII (input.c_str());
+    return std::move (Unicode2ASCII (input.c_str()));
 }
 extern std::string _utf2string (const std::string &utf8_input)
 {
-    return Unicode2ASCII (UTF2Unicode (utf8_input.c_str()).c_str());
+    return std::move (Unicode2ASCII (UTF2Unicode (utf8_input.c_str()).c_str()));
 }
 
 extern std::wstring _2wstring (const std::string &input)
 {
-    return ASCII2Unicode (input.c_str());
+    return std::move (ASCII2Unicode (input.c_str()));
 }
 extern std::wstring _utf2wstring (const std::string &utf8_input)
 {
-    return UTF2Unicode (utf8_input.c_str());
+    return std::move (UTF2Unicode (utf8_input.c_str()));
 }
 
 extern std::string _2utf8 (const std::wstring &input)
 {
-    return Unicode2UTF (input.c_str());
+    return std::move (Unicode2UTF (input.c_str()));
 }
 extern std::string _2utf8 (const std::string &input)
 {
-    return Unicode2UTF (ASCII2Unicode (input.c_str()).c_str());
+    return std::move (Unicode2UTF (ASCII2Unicode (input.c_str()).c_str()));
 }
 
 
