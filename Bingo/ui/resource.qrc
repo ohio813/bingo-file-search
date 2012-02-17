@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/image">
         <file>logo.png</file>
+		<file>setting.png</file>
+		<file>Search.png</file>
     </qresource>
 </RCC>
