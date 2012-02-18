@@ -29,17 +29,21 @@ public:
     ~BlockingQueue() {}
     inline bool empty()
     {
+        bool ret;
         synchronized (m_DataMutex)
         {
-            return m_data.empty();
+            ret = m_data.empty();
         }
+        return ret;
     }
     inline size_t size()
     {
+        size_t ret;
         synchronized (m_DataMutex)
         {
-            return m_data.size();
+            ret = m_data.size();
         }
+        return ret;
     }
     inline void put (const T &data)
     {
