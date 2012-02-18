@@ -115,14 +115,15 @@ extern TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime)
     time32 = (time32 + sysTime.wDay) * 24;
     time32 = (time32 + sysTime.wHour) * 60;
     time32 += sysTime.wMinute;
-    return time32;
+    return std::move (time32);
 }
 extern TIME32 FILETIMEtoTIME32 (const FILETIME &fileTime)
 {
     FILETIME localFileTime;
     FileTimeToLocalFileTime (&fileTime, &localFileTime);
     SYSTEMTIME sysTime;
-    return SYSTIMEtoTIME32 (sysTime);
+    FileTimeToSystemTime (&localFileTime, &sysTime);
+    return std::move (SYSTIMEtoTIME32 (sysTime));
 }
 extern void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime)
 {
@@ -142,4 +143,5 @@ extern void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime)
     time32 /= 12;
     sysTime.wYear = time32 + TIME32_YEAR_START;
 }
+
 ///:~
