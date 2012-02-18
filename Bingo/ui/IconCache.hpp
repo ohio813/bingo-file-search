@@ -77,7 +77,7 @@ public:
                         sizeof (SHFILEINFO), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES);
         QIcon ret = QIcon (QPixmap::fromWinHICON (info.hIcon));
         DestroyIcon (info.hIcon);
-        return ret;
+        return std::move (ret);
     }
 private:
     void getFolderIcon()
