@@ -4,43 +4,81 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core\
+		gui \
+		sql \
+		network
 
 TARGET = Bingo
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-    ui/mainwindow.cpp \
+    util/StringConvert.cpp \
+    util/Log.cpp \
+    util/Ini.cpp \
     core/VolumeMgr.cpp \
     core/USN.cpp \
     core/ThreadSync.cpp \
     core/NTFS.cpp \
+    core/Moniter.cpp \
     core/Memory.cpp \
     core/File.cpp \
     core/Data.cpp \
+    core/CoreMgr.cpp \
+    ui/settingwidget.cpp \
+    ui/searchwidget.cpp \
+    ui/mainwindow.cpp \
+    ui/Language.cpp \
     util/StringConvert.cpp \
+    util/PathDB.cpp \
+    util/MasterDB.cpp \
     util/Log.cpp \
-    util/Ini.cpp
+    util/Ini.cpp \
+    util/ConfigDB.cpp
 
-HEADERS  += ui/mainwindow.h \
+HEADERS  += util/StringConvert.h \
+    util/LRUCache.hpp \
+    util/Log.h \
+    util/Ini.h \
     core/VolumeMgr.h \
     core/VolumeLetter.h \
     core/USN.h \
     core/ThreadSync.h \
     core/NTFS.h \
+    core/Moniter.h \
     core/Memory.h \
     core/File.h \
     core/Data.h \
+    core/CoreMgr.h \
+    ui/settingwidget.h \
+    ui/searchwidget.h \
+    ui/mainwindow.h \
+    ui/Language.h \
+    ui/IconCache.hpp \
     util/StringConvert.h \
+    util/PathDB.h \
+    util/MasterDB.h \
     util/LRUCache.hpp \
     util/Log.h \
     util/Ini.h \
+    util/ConfigDB.h \
+    util/BlockingQueue.hpp
 
-FORMS    += ui/mainwindow.ui
+FORMS    += ui/mainwindow.ui \
+    ui/settingwidget.ui \
+    ui/searchwidget.ui
 
 RESOURCES += \
     ui/resource.qrc
+
+
+
+
+
+
+
+
 
 
 
