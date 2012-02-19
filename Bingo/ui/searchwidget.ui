@@ -102,7 +102,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>:/file/setting.png</normaloff>:/file/setting.png</iconset>
+           <normaloff>:/image/setting.png</normaloff>:/image/setting.png</iconset>
          </property>
          <property name="iconSize">
           <size>

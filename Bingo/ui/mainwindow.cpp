@@ -23,11 +23,22 @@
 
 MainWindow::MainWindow (QWidget *parent) :
     QMainWindow (parent),
-    ui (new Ui::MainWindow)
+    ui (new Ui::MainWindow),
+    searchwidget (new SearchWidget),
+    settingwidget (new SettingWidget),
+	stackedWidget(new QStackedWidget)
 {
     ui->setupUi (this);
+    setCentralWidget (stackedWidget);
+	stackedWidget->addWidget(searchwidget);
+	stackedWidget->addWidget(settingwidget);
+	stackedWidget->setCurrentWidget(searchwidget);
+    connect (searchwidget, SIGNAL (changeCenterWidget (bool)), this, SLOT (changeCenterWidget (bool)));
+    connect (settingwidget, SIGNAL (changeCenterWidget (bool)), this, SLOT (changeCenterWidget (bool)));
     //set language refresh
     connect (uidata_Lang, SIGNAL (refreshLangRequest()), this, SLOT (languageRefresh()));
+    connect (uidata_Lang, SIGNAL (refreshLangRequest()), searchwidget, SLOT (languageRefresh()));
+    connect (uidata_Lang, SIGNAL (refreshLangRequest()), settingwidget, SLOT (languageRefresh()));
     //setup System Tray Icon
     trayIcon = new QSystemTrayIcon (this);
     trayIcon->setIcon (QIcon (":/image/logo.png"));
@@ -74,6 +85,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::changeCenterWidget (bool isSearchwidget)
+{
+	if (isSearchwidget)
+		stackedWidget->setCurrentWidget(settingwidget);
+	else
+		stackedWidget->setCurrentWidget(searchwidget);
+}
 void MainWindow::onSystemTrayIconClicked (QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason)
@@ -108,7 +126,7 @@ void MainWindow::appInitStart()
 }
 void MainWindow::appInitProgress (int percent, QString detail)
 {
-	Log::v(detail.toStdWString());
+    Log::v (detail.toStdWString());
 }
 void MainWindow::appInitEnd()
 {
