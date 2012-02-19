@@ -57,6 +57,11 @@ MainWindow::MainWindow (QWidget *parent) :
             localServer->listen ("Bingo-File-Search");
         }
     }
+
+    //connect between UI with CoreMgr for app initial
+    connect (data_coreMgr, SIGNAL (appInitStart()), this, SLOT (appInitStart()));
+    connect (data_coreMgr, SIGNAL (appInitProgress (int, QString)), this, SLOT (appInitProgress (int, QString)));
+    connect (data_coreMgr, SIGNAL (appInitEnd()), this, SLOT (appInitEnd()));
 }
 
 MainWindow::~MainWindow()
@@ -92,8 +97,20 @@ void MainWindow::newLocalSocketConnection()
 
 void MainWindow::languageRefresh()
 {
+    this->setWindowTitle (tr ("Bingo"));
     trayIcon->setToolTip (tr ("Bingo!"));
     trayIconMenuActionRestore->setText (tr ("Restore"));
     trayIconMenuActionQuit->setText (tr ("Quit"));
+}
+
+void MainWindow::appInitStart()
+{
+}
+void MainWindow::appInitProgress (int percent, QString detail)
+{
+	Log::v(detail.toStdWString());
+}
+void MainWindow::appInitEnd()
+{
 }
 ///:~
