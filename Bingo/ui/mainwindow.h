@@ -42,6 +42,10 @@ public slots:
     void newLocalSocketConnection();
     //language refresh
     void languageRefresh();
+    //app initial
+    void appInitStart();
+    void appInitProgress (int percent, QString detail);
+	void appInitEnd();
 private:
     Ui::MainWindow *ui;
     //System Tray Icon
