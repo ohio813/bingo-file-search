@@ -17,6 +17,10 @@
 ///:settingwidget.cpp
 #include "settingwidget.h"
 #include "ui_settingwidget.h"
+#include "../core/Data.h"
+#include "Language.h"
+#include <vector>
+using namespace std;
 
 SettingWidget::SettingWidget (QWidget *parent) :
     QWidget (parent),
@@ -24,6 +28,18 @@ SettingWidget::SettingWidget (QWidget *parent) :
 {
     ui->setupUi (this);
     connect (ui->pushButton_2, SIGNAL (clicked()), this, SLOT (changeCenterWidgetReq()));
+    int curLangIndex = 0, tmp_LangIndex = 0;
+    QLocale curLang = uidata_Lang->getCurLang();
+    foreach (QLocale locale, uidata_Lang->listAllLang())
+    {
+        ui->comboBox->addItem (QString ("%1(%2)").arg (QLocale::languageToString (locale.language()), QLocale::countryToString (locale.country())));
+
+        if (locale == curLang)
+            curLangIndex = tmp_LangIndex;
+        else tmp_LangIndex++;
+    }
+    ui->comboBox->setCurrentIndex (curLangIndex);
+    connect (ui->pushButton, SIGNAL (clicked()), this, SLOT (langApply()));
 }
 
 SettingWidget::~SettingWidget()
@@ -45,5 +61,25 @@ void SettingWidget:: languageRefresh()
 void SettingWidget::changeCenterWidgetReq()
 {
     emit changeCenterWidget (false);
+}
+
+void SettingWidget::langApply()
+{
+    vector<QLocale> allLang = uidata_Lang->listAllLang();
+    int newLang = ui->comboBox->currentIndex();
+
+    if (allLang[newLang] != uidata_Lang->getCurLang())
+    {
+        uidata_Lang->setCurLang (allLang[newLang]);
+		int curLangIndex = 0, tmp_LangIndex = 0;
+		QLocale curLang = uidata_Lang->getCurLang();
+		foreach (QLocale locale, uidata_Lang->listAllLang())
+		{
+			if (locale == curLang)
+				curLangIndex = tmp_LangIndex;
+			else tmp_LangIndex++;
+		}
+		ui->comboBox->setCurrentIndex (curLangIndex);
+    }
 }
 ///:~

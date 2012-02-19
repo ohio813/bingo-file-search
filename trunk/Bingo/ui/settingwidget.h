@@ -35,6 +35,7 @@ public:
 public slots:
     //language refresh
     void languageRefresh();
+	void langApply();
     void changeCenterWidgetReq();
 signals:
     void explains();
