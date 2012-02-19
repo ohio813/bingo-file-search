@@ -19,8 +19,10 @@
 #define SEARCHWIDGET_H
 
 #include <QWidget>
+#include "../core/File.h"
 
-namespace Ui {
+namespace Ui
+{
     class SearchWidget;
 }
 
@@ -29,13 +31,33 @@ class SearchWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit SearchWidget(QWidget *parent = 0);
+    explicit SearchWidget (QWidget *parent = 0);
     ~SearchWidget();
+    bool isRegularMatchFilterOn();
+    bool isFullFathMatchFilterOn();
+    bool isDateModifiedFilterOn();
+    bool isDateCreatedFilterOn();
+    bool isSizeFilterOn();
+    bool isFileTypeFilterOn();
+    bool isReadOnlyOn();
+    bool isHiddenOn();
+    bool isSystemOn();
+    bool isDirectoryOn();
+    TIME32 getDateModifiedBegin();
+    TIME32 getDateModifiedEnd();
+    TIME32 getDateCreatedBegin();
+    TIME32 getDateCreatedEnd();
+    DWORD getSizeFilterBegin();
+    DWORD getSizeFilterEnd();
+    QString getSearchKeyWord();
 
 public slots:
     //language refresh
-        void languageRefresh();
-
+    void languageRefresh();
+    void changeCenterWidgetReq();
+signals:
+    void explains();
+    void changeCenterWidget (bool isSearchwidget);
 private:
     Ui::SearchWidget *ui;
 };

@@ -18,11 +18,12 @@
 #include "settingwidget.h"
 #include "ui_settingwidget.h"
 
-SettingWidget::SettingWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::SettingWidget)
+SettingWidget::SettingWidget (QWidget *parent) :
+    QWidget (parent),
+    ui (new Ui::SettingWidget)
 {
-    ui->setupUi(this);
+    ui->setupUi (this);
+    connect (ui->pushButton_2, SIGNAL (clicked()), this, SLOT (changeCenterWidgetReq()));
 }
 
 SettingWidget::~SettingWidget()
@@ -32,13 +33,17 @@ SettingWidget::~SettingWidget()
 
 void SettingWidget:: languageRefresh()
 {
-    ui->groupBox->setTitle(tr("Region and Language"));
-    ui->label_2->setText(tr("Choose a display language:"));
-    ui->pushButton->setText(tr("Apply"));
-    ui->pushButton_2->setToolTip(tr("Search"));
-    ui->groupBox_2->setTitle(tr("Search Region"));
-    ui->label_3->setText(tr("Search results in:"));
-    ui->groupBox_3->setTitle(tr("About"));
+    ui->groupBox->setTitle (tr ("Region and Language"));
+    ui->label_2->setText (tr ("Choose a display language:"));
+    ui->pushButton->setText (tr ("Apply"));
+    ui->pushButton_2->setToolTip (tr ("Search"));
+    ui->groupBox_2->setTitle (tr ("Search Region"));
+    ui->label_3->setText (tr ("Search results in:"));
+    ui->groupBox_3->setTitle (tr ("About"));
 }
 
+void SettingWidget::changeCenterWidgetReq()
+{
+    emit changeCenterWidget (false);
+}
 ///:~

@@ -20,7 +20,8 @@
 
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
     class SettingWidget;
 }
 
@@ -29,12 +30,15 @@ class SettingWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit SettingWidget(QWidget *parent = 0);
+    explicit SettingWidget (QWidget *parent = 0);
     ~SettingWidget();
 public slots:
-//language refresh
+    //language refresh
     void languageRefresh();
-
+    void changeCenterWidgetReq();
+signals:
+    void explains();
+    void changeCenterWidget (bool isSearchwidget);
 private:
     Ui::SettingWidget *ui;
 };
