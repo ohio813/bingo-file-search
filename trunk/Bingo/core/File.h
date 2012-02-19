@@ -35,7 +35,11 @@ typedef unsigned __int32 TIME32;
 *   It assumes that every month has 31 days.
 */
 
+#include <QDateTime>
+#include <QDate>
+#include <QTime>
 __forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime);
+__forceinline TIME32 QTIMEtoTIME32 (const QDateTime &qDTime);
 __forceinline TIME32 FILETIMEtoTIME32 (const FILETIME &fileTime);
 __forceinline void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime);
 

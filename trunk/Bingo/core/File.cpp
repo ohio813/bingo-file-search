@@ -117,6 +117,18 @@ extern TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime)
     time32 += sysTime.wMinute;
     return std::move (time32);
 }
+extern TIME32 QTIMEtoTIME32 (const QDateTime &qDTime)
+{
+    TIME32 time32;
+    QDate qDate = qDTime.date();
+    QTime qTime = qDTime.time();
+    time32 = (qDate.year() - TIME32_YEAR_START) * 12;
+    time32 = (time32 + qDate.month()) * 31;
+    time32 = (time32 + qDate.day()) * 24;
+    time32 = (time32 + qTime.hour()) * 60;
+    time32 += qTime.minute();
+    return std::move (time32);
+}
 extern TIME32 FILETIMEtoTIME32 (const FILETIME &fileTime)
 {
     FILETIME localFileTime;
