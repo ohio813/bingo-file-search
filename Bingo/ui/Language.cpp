@@ -61,7 +61,14 @@ QLocale Language::getCurLang()
             return QLocale (QLocale::English);
     }
     else
-        return QLocale (QString::fromStdWString (defaultLang));
+    {
+        QLocale locale (QString::fromStdWString (defaultLang));
+
+        if (QFile::exists (qmPath.arg (locale.name())))
+            return locale;
+        else
+            return QLocale (QLocale::English);
+    }
 }
 
 void Language::setCurLang (QLocale lang)
