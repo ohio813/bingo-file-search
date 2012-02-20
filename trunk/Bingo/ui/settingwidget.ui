@@ -227,6 +227,14 @@
         <property name="readOnly">
          <bool>true</bool>
         </property>
+        <property name="plainText">
+         <string>Version: Alpha 1.0
+Homepage: http://code.google.com/p/bingo-file-search/
+Copyright (C) 2011-2012  Xu Cheng, Yang Zhengyu ,Zuo Zhiheng
+
+This program is a free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+</string>
+        </property>
        </widget>
       </item>
      </layout>
