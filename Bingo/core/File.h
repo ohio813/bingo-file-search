@@ -38,10 +38,19 @@ typedef unsigned __int32 TIME32;
 #include <QDateTime>
 #include <QDate>
 #include <QTime>
+#include <QString>
 __forceinline TIME32 SYSTIMEtoTIME32 (const SYSTEMTIME &sysTime);
 __forceinline TIME32 QTIMEtoTIME32 (const QDateTime &qDTime);
 __forceinline TIME32 FILETIMEtoTIME32 (const FILETIME &fileTime);
 __forceinline void TIME32toSYSTIME (TIME32 time32, SYSTEMTIME &sysTime);
+__forceinline QString TIME32toQStr (const TIME32& time32)
+{
+    SYSTEMTIME sysTime;
+    TIME32toSYSTIME (time32, sysTime);
+    QString str;
+    str.sprintf ("%d-%02d-%02d %d:%02d", sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour, sysTime.wMinute);
+    return std::move (str);
+}
 
 __forceinline unsigned __int32 FileSizeinKB (unsigned __int64 size)
 {
@@ -51,6 +60,19 @@ __forceinline unsigned __int32 FileSizeinKB (unsigned __int64 size)
         out++;
 
     return out;
+}
+__forceinline QString FileSizeinStr (unsigned __int32 size)
+{
+	QString str;
+
+	if (size < 1024)
+		str.sprintf ("%d KB", size);
+	else if (size < 1048576)
+		str.sprintf ("%.2f MB", size / 1024.0);
+	else
+		str.sprintf ("%.2f GB", size / 1048576.0);
+
+	return std::move (str);
 }
 #endif
 ///:~
