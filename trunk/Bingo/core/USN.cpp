@@ -49,12 +49,21 @@ bool VolUSN::StartUp()
 
         if (ptr == data_configDB->m_LastRecord.end())
         {
+            Log::v (L"ReStart a new USN journal of driver[%c:\\], since not last record found on config.db", m_Path);
             data_masterDB->DeleteTable (m_Path);
             goto NewStart;
         }
 
-        if (ptr.value().UsnJournalID != m_UsnInfo.UsnJournalID || ptr.value().NextUsn < m_UsnInfo.FirstUsn)
+        if (ptr.value().UsnJournalID != m_UsnInfo.UsnJournalID)
         {
+            Log::v (L"ReStart a new USN journal of driver[%c:\\], since diff UsnJournalID", m_Path);
+            data_masterDB->DeleteTable (m_Path);
+            goto NewStart;
+        }
+
+        if (ptr.value().NextUsn < m_UsnInfo.FirstUsn)
+        {
+            Log::v (L"ReStart a new USN journal of driver[%c:\\], since NextUsn < m_UsnInfo.FirstUsn", m_Path);
             data_masterDB->DeleteTable (m_Path);
             goto NewStart;
         }
@@ -113,6 +122,7 @@ void VolUSN::Exit()
     data_MemPool->free (m_readBuff);
     data_configDB->m_LastRecord.insert (WChartoCharLetter (m_Path),
                                         ConfigDBLastRecordTableNode (m_UsnInfo.UsnJournalID, m_UsnInfo.NextUsn));
+    data_configDB->setChanged();
     data_pathDB->DropTable (WChartoCharLetter (m_Path));
     data_VolHandles->close (m_Path);
 }
@@ -129,6 +139,7 @@ void VolUSN::Disable()
     if (ptr != data_configDB->m_LastRecord.end())
         data_configDB->m_LastRecord.erase (ptr);
 
+    data_configDB->setChanged();
     data_masterDB->DropTable (m_Path);
     data_pathDB->DropTable (WChartoCharLetter (m_Path));
     data_VolHandles->close (m_Path);

@@ -99,7 +99,10 @@ void ConfigDB::ReadTable (int i)
             break;
     }
 }
-
+void ConfigDB::setChanged()
+{
+    m_changed = true;
+}
 void ConfigDB::WriteTable ()
 {
     if (!m_db.open())

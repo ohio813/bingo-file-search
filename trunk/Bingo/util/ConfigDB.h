@@ -44,6 +44,7 @@ public:
     }
     QMap <char, ConfigDBLastRecordTableNode> m_LastRecord;
     QSet <char> m_Disable;
+	void setChanged();
     void WriteTable ();
 private:
     void ReadTable (int i);
