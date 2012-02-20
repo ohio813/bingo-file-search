@@ -29,6 +29,7 @@ MasterDB *data_masterDB;
 PathDB *data_pathDB;
 Moniter *data_Moniter;
 Language *uidata_Lang;
+IconCache *uidata_iconCahe;
 
 void InitGlobalData()
 {
