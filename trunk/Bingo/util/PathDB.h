@@ -28,13 +28,9 @@ class PathDB : public ReadWriteSync
 {
 public:
     PathDB();
-    ~PathDB();
-    void CreateTable (char Path);
+    ~PathDB() {}
     void DropTable (char Path);
-    QSqlQuery* copyRootQuery();
-    void DumpDB();
 private:
-    QSqlDatabase m_db;
     QSqlQuery m_query;
 };
 
@@ -60,14 +56,14 @@ class PathGen : public MultiProcessorThread
     } _Node;
 public:
     PathGen() : _cache (16) {}
-    ~PathGen();    
-    void setMasterQuery (QSqlQuery* masterQuery);
-    void setPathQuery (QSqlQuery* pathQuery);
+    ~PathGen() {}
     void setPath (char path);
+    void init();
+    void move();
     void run();
 private:
-    QSqlQuery* m_masterQuery;
-    QSqlQuery* m_pathQuery;
+    QSqlDatabase m_tmpDB;
+    QSqlQuery m_tmpQuery, m_masterQuery;
     char m_Path;
     QStack<_Node> _nodeStack;
     QSqlQuery _findPathQuery, _findIndexQuery, _existPathQuery;

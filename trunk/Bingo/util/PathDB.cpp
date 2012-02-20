@@ -28,21 +28,7 @@
 #pragma region PathDB
 PathDB::PathDB()
 {
-    m_db = QSqlDatabase::addDatabase ("QSQLITE", "path_db");
-    m_db.setDatabaseName (":memory:");
-    m_db.open();
-    m_query = QSqlQuery (m_db);
-    m_query.exec ("PRAGMA encoding ='UTF-8';");
-}
-PathDB::~PathDB()
-{
-    m_db.close();
-}
-void PathDB::CreateTable (char Path)
-{
-    m_query.exec (QString ("create table Path_%1 "
-                           "(frn integer(8) primary key, path vchar)").arg (Path));
-    Log::v (QString ("Create table Path_%1").arg (Path));
+    m_query = QSqlQuery (data_masterDB->getQuery());
 }
 void PathDB::DropTable (char Path)
 {
@@ -51,77 +37,142 @@ void PathDB::DropTable (char Path)
     m_query.exec ("VACUUM;");
     Log::v (QString ("Drop table Path_%1").arg (Path));
 }
-QSqlQuery* PathDB::copyRootQuery()
-{
-    return data_MemPool->mallocClass<QSqlQuery, QSqlDatabase> (m_db);
-}
-extern bool SqlMemoryDBLoadorSave (QSqlDatabase& memdb, QSqlDatabase& filedb, bool load);
-void PathDB::DumpDB()
-{
-    QSqlDatabase m_filedb = QSqlDatabase::addDatabase ("QSQLITE", "path_file_db");
-    m_filedb.setDatabaseName (QCoreApplication::applicationDirPath() + "/Data/path.db");
-
-    if (m_filedb.open())
-        SqlMemoryDBLoadorSave (m_db, m_filedb, false);
-
-    m_filedb.close();
-}
 #pragma endregion PathDB
 
 #pragma region PathGen
-PathGen::~PathGen()
-{
-    _findPathQuery.clear();
-    _findIndexQuery.clear();
-    _existPathQuery.clear();
-    m_masterQuery->clear();
-    m_pathQuery->clear();
-    data_MemPool->free (m_masterQuery);
-    data_MemPool->free (m_pathQuery);
-}
-void PathGen::setMasterQuery (QSqlQuery* masterQuery)
-{
-    m_masterQuery = masterQuery;
-}
-void PathGen::setPathQuery (QSqlQuery* pathQuery)
-{
-    m_pathQuery = pathQuery;
-}
 void PathGen::setPath (char path)
 {
     m_Path = path;
 }
+void PathGen::init()
+{
+    m_tmpDB = QSqlDatabase::addDatabase ("QSQLITE", QString ("path_gen_%1").arg (m_Path));
+    m_tmpDB.setDatabaseName (":memory:");
+    m_tmpDB.open();
+    m_tmpQuery = QSqlQuery (m_tmpDB);
+    m_tmpQuery.exec (QString ("create table Path_%1 "
+                              "(frn integer(8) primary key, path vchar)").arg (m_Path));
+    Log::v (QString ("Create table Path_%1").arg (m_Path));
+    m_masterQuery = QSqlQuery (data_masterDB->getDB());
+}
+void PathGen::move()
+{
+    QSqlDatabase *fromDB = &m_tmpDB;
+    QSqlDatabase *toDB = &data_masterDB->getDB();
+    QSqlQuery fromQuery (*fromDB);
+    QSqlQuery toQuery (*toDB);
+    QStringList tableList;
+    //Copy the tables
+    fromQuery.exec ("SELECT sql, tbl_name FROM sqlite_master "
+                    " WHERE type='table' AND sql NOT NULL and name NOT IN ('sqlite_stat1', 'sqlite_sequence')");
+
+    while (fromQuery.next())
+    {
+        toQuery.exec (fromQuery.value (0).toString());
+        tableList.push_back (fromQuery.value (1).toString());
+    }
+
+    //Copy records
+    toDB->exec ("BEGIN");
+    fromQuery.setForwardOnly (true);
+    foreach (QString tableName, tableList)
+    {
+        fromQuery.exec (QString ("select * from %1").arg (tableName));
+
+        if (fromQuery.next())
+        {
+            int cols = fromQuery.record().count();
+
+            if (cols != 0)
+            {
+                std::vector<QVariantList> rec;
+                rec.resize (cols);
+                QString tmp = "?";
+
+                for (int i = 1; i < cols; ++i)
+                    tmp.append (",?");
+
+                toQuery.prepare (QString ("insert into %1 values(").arg (tableName).append (tmp).append (")"));
+
+                for (int i = 0; i < cols; ++i)
+                    rec[i] << fromQuery.value (i);
+
+                while (fromQuery.next())
+                    for (int i = 0; i < cols; ++i)
+                        rec[i] << fromQuery.value (i);
+
+                for (int i = 0; i < cols; ++i)
+                    toQuery.addBindValue (rec[i]);
+
+                toQuery.execBatch();
+            }
+        }
+    }
+    fromQuery.finish();
+    toDB->exec ("COMMIT");
+    //Optimization
+    toDB->exec ("PRAGMA case_sensitive_like=true;");
+    toDB->exec ("PRAGMA journal_mode=MEMORY;");
+    toDB->exec ("PRAGMA temp_store=MEMORY;");
+    toDB->exec ("PRAGMA locking_mode=EXCLUSIVE;");
+    toDB->exec ("PRAGMA synchronous = OFF;");
+    toDB->exec ("PRAGMA encoding = \"UTF-8\";");
+    //Copy the triggers
+    fromQuery.exec ("SELECT sql FROM sqlite_master "
+                    " WHERE type='trigger' AND sql NOT NULL and name NOT IN ('sqlite_stat1', 'sqlite_sequence')");
+
+    while (fromQuery.next())
+        toQuery.exec (fromQuery.value (0).toString());
+
+    //Copy the indexes
+    fromQuery.exec ("SELECT sql FROM sqlite_master "
+                    " WHERE type='index' AND sql NOT NULL and name NOT IN ('sqlite_stat1', 'sqlite_sequence')");
+
+    while (fromQuery.next())
+        toQuery.exec (fromQuery.value (0).toString());
+
+    //Copy the views
+    fromQuery.exec ("SELECT sql FROM sqlite_master "
+                    " WHERE type='view' AND sql NOT NULL and name NOT IN ('sqlite_stat1', 'sqlite_sequence')");
+
+    while (fromQuery.next())
+        toQuery.exec (fromQuery.value (0).toString());
+
+    m_tmpDB.close();
+}
+extern bool SqlMemoryDBLoadorSave (QSqlDatabase& memdb, QSqlDatabase& filedb, bool load);
 void PathGen::run()
 {
-    m_pathQuery->prepare (QString ("insert into Path_%1 values (? ,'%1:')").arg (m_Path));
-    m_pathQuery->bindValue (0, qulonglong (RootFile_pfrn));
-    m_pathQuery->exec ();
+    init();
+    m_tmpQuery.prepare (QString ("insert into Path_%1 values (? ,'%1:')").arg (m_Path));
+    m_tmpQuery.bindValue (0, qulonglong (RootFile_pfrn));
+    m_tmpQuery.exec ();
     // pre-complie
-    _findIndexQuery = QSqlQuery (*m_masterQuery);
-    _findPathQuery = QSqlQuery (*m_pathQuery);
-    _existPathQuery = QSqlQuery (*m_pathQuery);
+    _findIndexQuery = QSqlQuery (m_masterQuery);
+    _findPathQuery = QSqlQuery (m_tmpQuery);
+    _existPathQuery = QSqlQuery (m_tmpQuery);
     _findIndexQuery.setForwardOnly (true);
     _findIndexQuery.prepare (QString ("select frn,pfrn,name from Master_%1 where frn=?").arg (m_Path));
     _findPathQuery.setForwardOnly (true);
     _findPathQuery.prepare (QString ("select path from Path_%1 where frn=?").arg (m_Path));
     _existPathQuery.setForwardOnly (true);
     _existPathQuery.prepare (QString ("select 1 where exists(select 1 from Path_%1 where frn=?)").arg (m_Path));
-    m_pathQuery->prepare (QString ("insert into Path_%1 values (?,?) ").arg (m_Path));
-    m_masterQuery->setForwardOnly (true);
-    m_masterQuery->exec (QString ("select frn,pfrn,name from Master_%1").arg (m_Path));
+    m_tmpQuery.prepare (QString ("insert into Path_%1 values (?,?) ").arg (m_Path));
+    m_masterQuery.setForwardOnly (true);
+    m_masterQuery.exec (QString ("select frn,pfrn,name from Master_%1").arg (m_Path));
 
-    while (m_masterQuery->next())
+    while (m_masterQuery.next())
     {
-        _Node _node (m_masterQuery->value (0).toULongLong(),
-                     m_masterQuery->value (1).toULongLong(), m_masterQuery->value (2).toByteArray());
+        _Node _node (m_masterQuery.value (0).toULongLong(),
+                     m_masterQuery.value (1).toULongLong(), m_masterQuery.value (2).toByteArray());
         QByteArray _cacheout;
 
         if (_cache.get (_node.PFRN, _cacheout))
         {
-            m_pathQuery->bindValue (0, _node.FRN);
-            m_pathQuery->bindValue (1, _cacheout + "\\" + _node.FileName);
-            m_pathQuery->exec();
-            m_pathQuery->finish();
+            m_tmpQuery.bindValue (0, _node.FRN);
+            m_tmpQuery.bindValue (1, _cacheout + "\\" + _node.FileName);
+            m_tmpQuery.exec();
+            m_tmpQuery.finish();
             continue;
         }
 
@@ -153,20 +204,20 @@ void PathGen::run()
                     while (_nodeStack.size() > 1)
                     {
                         _node = _nodeStack.pop();
-                        m_pathQuery->bindValue (0, _node.FRN);
+                        m_tmpQuery.bindValue (0, _node.FRN);
                         tmppath += ("\\" + _node.FileName);
-                        m_pathQuery->bindValue (1, tmppath);
-                        m_pathQuery->exec();
-                        m_pathQuery->finish();
+                        m_tmpQuery.bindValue (1, tmppath);
+                        m_tmpQuery.exec();
+                        m_tmpQuery.finish();
                     }
 
                     _node = _nodeStack.pop();
                     _cache.put (_node.PFRN, tmppath);
-                    m_pathQuery->bindValue (0, _node.FRN);
+                    m_tmpQuery.bindValue (0, _node.FRN);
                     tmppath += ("\\" + _node.FileName);
-                    m_pathQuery->bindValue (1, tmppath);
-                    m_pathQuery->exec();
-                    m_pathQuery->finish();
+                    m_tmpQuery.bindValue (1, tmppath);
+                    m_tmpQuery.exec();
+                    m_tmpQuery.finish();
                     break;
                 }
                 else
@@ -186,7 +237,7 @@ void PathGen::run()
                     else
                     {
                         Log::w (QString ("Unknow pfrn for file : ").append (_node.FileName));
-                        QSqlQuery deleteQuery = QSqlQuery (*m_masterQuery);
+                        QSqlQuery deleteQuery = QSqlQuery (m_masterQuery);
                         deleteQuery.prepare (QString ("delete from Master_%1 where frn=?").arg (m_Path));
 
                         while (!_nodeStack.empty())
@@ -202,9 +253,17 @@ void PathGen::run()
         }
     }
 
-    m_pathQuery->exec (QString ("update Path_%1 set path='%1:\\' where frn=?").arg (m_Path));
-    m_pathQuery->bindValue (0, qulonglong (RootFile_pfrn));
-    m_pathQuery->exec ();
+    m_tmpQuery.exec (QString ("update Path_%1 set path='%1:\\' where frn=?").arg (m_Path));
+    m_tmpQuery.bindValue (0, qulonglong (RootFile_pfrn));
+    m_tmpQuery.exec ();
+    _findPathQuery.clear();
+    _findIndexQuery.clear();
+    _existPathQuery.clear();
+    m_masterQuery.clear();
+    m_tmpQuery.clear();
+    data_pathDB->beginwrite();
+    move();
+    data_pathDB->endwrite();
     Log::v (QString ("Generate Path for volume[%1:\\] successed.").arg (m_Path));
 }
 #pragma endregion PathGen

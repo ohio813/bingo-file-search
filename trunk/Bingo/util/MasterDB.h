@@ -29,6 +29,8 @@ class MasterDB : public ReadWriteSync
 public:
     MasterDB();
     ~MasterDB();
+    QSqlDatabase& getDB();
+    QSqlQuery& getQuery();
     bool TableContains (char Path);
     void CreateTable (char Path);
     void DeleteTable (char Path);
@@ -37,7 +39,6 @@ public:
                      const DWORD& attrib, const DWORD& size, const TIME32& createTime, const TIME32& writeTime);
     void ReadLastUSNDel (char Path, unsigned __int64 frn);
     QStringList getAllTables();
-    QSqlQuery* copyRootQuery();
 private:
     QSqlDatabase m_db;
     QSqlDatabase m_filedb;

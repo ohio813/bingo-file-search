@@ -32,9 +32,6 @@ CoreMgr::CoreMgr()
 
 CoreMgr::~CoreMgr()
 {
-#ifdef _DEBUG
-    data_pathDB->DumpDB();
-#endif
     foreach (VolUSN * volUSN, m_VolUsns)
     {
         volUSN->Exit();
@@ -73,8 +70,6 @@ void CoreMgr::run()
                 PathGen *pathGen = data_MemPool->mallocClass<PathGen>();
                 pathGenVector.push_back (pathGen);
                 pathGen->setPath (Path);
-                pathGen->setMasterQuery (data_masterDB->copyRootQuery());
-                pathGen->setPathQuery (data_pathDB->copyRootQuery());
                 scanVolSet.insert (Path);
             }
         }
