@@ -26,6 +26,7 @@
 #include "../util/MasterDB.h"
 #include "../util/PathDB.h"
 #include "../ui/Language.h"
+#include "../ui/IconCache.hpp"
 
 // link the global data.
 extern CoreMgr *data_coreMgr;
@@ -37,6 +38,7 @@ extern MasterDB *data_masterDB;
 extern PathDB *data_pathDB;
 extern Moniter *data_Moniter;
 extern Language *uidata_Lang;
+extern IconCache *uidata_iconCahe;
 
 // global data associated function
 void InitGlobalData();        // initial data
