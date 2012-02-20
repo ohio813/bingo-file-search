@@ -126,6 +126,14 @@ MasterDB::~MasterDB()
     m_db.close();
     m_filedb.close();
 }
+QSqlDatabase& MasterDB::getDB()
+{
+    return m_db;
+}
+QSqlQuery& MasterDB::getQuery()
+{
+    return m_query;
+}
 bool MasterDB::TableContains (char Path)
 {
     return m_db.tables().contains (QString ("Master_%1").arg (Path));
@@ -180,9 +188,5 @@ void MasterDB::ReadLastUSNDel (char Path, unsigned __int64 frn)
 QStringList MasterDB::getAllTables()
 {
     return m_db.tables();
-}
-QSqlQuery* MasterDB::copyRootQuery()
-{
-    return data_MemPool->mallocClass<QSqlQuery, QSqlDatabase> (m_db);
 }
 ///:~

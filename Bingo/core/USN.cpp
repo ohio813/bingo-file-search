@@ -34,7 +34,6 @@ bool VolUSN::StartUp()
 {
     data_VolHandles->open (m_Path);
     m_hVol = (*data_VolHandles) [m_Path];
-    data_pathDB->CreateTable (WChartoCharLetter (m_Path));
     bool jumpCreate = false;
 
     if (QueryUSN())
