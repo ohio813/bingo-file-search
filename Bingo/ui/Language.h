@@ -38,6 +38,7 @@ signals:
 private:
     std::wstring configPath;
     QString qmPath;
+	QTranslator qtTranslator;
 };
 
 #endif
