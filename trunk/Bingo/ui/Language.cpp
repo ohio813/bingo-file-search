@@ -39,8 +39,6 @@ void Language::loadLang()
     else
         defaultLocal = QLocale (QString::fromStdWString (defaultLang));
 
-    QTranslator qtTranslator;
-
     if (!qtTranslator.load (qmPath.arg (defaultLocal.name())))
         qtTranslator.load (qmPath.arg (QLocale (QLocale::English).name()));
 
@@ -53,7 +51,7 @@ QLocale Language::getCurLang()
 
     if (defaultLang == L"")
     {
-        QLocale locale = QLocale::system();
+        QLocale locale = QLocale (QLocale::system().name());
 
         if (QFile::exists (qmPath.arg (locale.name())))
             return locale;
@@ -78,7 +76,6 @@ void Language::setCurLang (QLocale lang)
     else
         Ini_WriteValue (configPath, L"Config", L"Default", lang.name().toStdWString());
 
-    QTranslator qtTranslator;
     qtTranslator.load (qmPath.arg (lang.name()));
     qApp->installTranslator (&qtTranslator);
     emit refreshLangRequest();
