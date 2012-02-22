@@ -1,101 +1,106 @@
+/**
+*   Copyright (C) 2011  Xu Cheng, Yang Zhengyu ,Zuo Zhiheng
+*
+*   This program is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+///:DispModel.cpp
 #include "DispModel.h"
-#include "File.h"
+#include "..\core\File.h"
 
-DispModel::DispModel(QObject *parent):QSqlQueryModel(parent)
+DispModel::DispModel (QObject *parent) : QSqlQueryModel (parent)
 {
 }
 
 
-QVariant DispModel::data(const QModelIndex &index,int role) const
+QVariant DispModel::data (const QModelIndex &index, int role) const
 {
-    QVariant value=QSqlQueryModel::data(index,role);
+    QVariant value = QSqlQueryModel::data (index, role);
 
-    if(!index.isValid())
+    if (!index.isValid())
     {
         return QVariant();
     }
-    if(role==Qt::TextAlignmentRole)
+
+    if (role == Qt::TextAlignmentRole)
     {
-		if(index.column()==0)
-		{
-			return int(Qt::AlignCenter);
-		}
-		if(index.column()==1||index.column()==2)
-		{
-			return int(Qt::AlignLeft|Qt::AlignVCenter);
-		}
-		else
-		{
-			return int(Qt::AlignRight|Qt::AlignVCenter);
-		}
-    }
-    else if(role==Qt::DisplayRole)
-    {
-        if (index.column()==0)
-	{
-            //TODO: display icons
-            return "ICONS";
-	}
-        else if (index.column()==3)
+        if (index.column() == 0)
         {
-			QString dispNum=value.toString();
-			QString dispKB=" KB";
-			return dispNum+dispKB;
+            return int (Qt::AlignCenter);
         }
-        else if(index.column()==4)
+
+        if (index.column() == 1 || index.column() == 2)
         {
-            TIME32 time=value.toInt();
-			SYSTEMTIME sysTime;
-			TIME32toSYSTIME(time,sysTime);
-			QString _year=number(sysTime.wYear);
-			QString _month=number(sysTime.wMonth);
-			if (_month.length()==1)
-			{
-				_month.insert(0,'0');
-			}
-			QString _day=number(sysTime.wDay);
-			if (_day.length()==1)
-			{
-				_day.insert(0,'0');
-			}
-			QString _hour=number(sysTime.wHour);
-			if (_hour.length()==1)
-			{
-				_hour.insert(0,'0');
-			}
-			QString _minute=number(sysTime.wMinute);
-			if (_minute.length()==1)
-			{
-				_minute.insert(0,'0');
-			}
-			return _year+'/'+_month+'/'+_day+' '+_hour+':'+_minute;
+            return int (Qt::AlignLeft | Qt::AlignVCenter);
         }
         else
         {
-            return value;
+            return int (Qt::AlignRight | Qt::AlignVCenter);
         }
     }
+    else if (role == Qt::DisplayRole)
+    {
+        if (index.column() == 0)
+        {
+            //TODO: display icons
+            return "ICONS";
+        }
+        else if (index.column() == 3)
+            return FileSizeinStr (value.toInt());
+        else if (index.column() == 4 || index.column() == 5)
+            return TIME32toQStr (value.toInt());
+        else
+            return value;
+    }
+
     return QVariant();
 }
 
-void DispModel::sort(int column, Qt::SortOrder order)
+void DispModel::sort (int column, Qt::SortOrder order)
 {
-	QString _order="select FRN,FNAME,FRN,fileSize,fileTime from [DISP] order by ";
-	switch (column)
-	{
-	case 0:return;
-	case 1:_order+="FNAME ";
-		break;
-	case 2:_order+="FRN ";
-		break;
-	case 3:_order+="fileSize ";
-		break;
-	case 4:_order+="fileSize ";
-		break;
-	}
-	if(order==Qt::DescendingOrder)
-	{
-		_order+="DESC";
-	}
-	this->setQuery(_order);
+    QString _order = sql + "order by ";
+
+    switch (column)
+    {
+        case 0:
+            return;
+
+        case 1:
+            _order += "name ";
+            break;
+
+        case 2:
+            _order += "path ";
+            break;
+
+        case 3:
+            _order += "size ";
+            break;
+
+        case 4:
+            _order += "createTime ";
+            break;
+
+        case 5:
+            _order += "writeTime ";
+            break;
+    }
+
+    if (order == Qt::DescendingOrder)
+    {
+        _order += "DESC";
+    }
+
+    this->setQuery (_order);
 }
+///:~

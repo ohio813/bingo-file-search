@@ -24,10 +24,13 @@
 class DispModel : public QSqlQueryModel
 {
 public:
-	DispModel(QObject *parent=0);
-	void sort(int column, Qt::SortOrder order);
+    DispModel (QObject *parent = 0);
+    void sort (int column, Qt::SortOrder order);
+    QString sql;
 private:
-        QVariant data(const QModelIndex &index,int role) const;
+    QVariant data (const QModelIndex &index, int role) const;
 };
 
 #endif
+
+///:~
