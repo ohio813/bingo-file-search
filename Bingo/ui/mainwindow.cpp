@@ -26,13 +26,20 @@ MainWindow::MainWindow (QWidget *parent) :
     ui (new Ui::MainWindow),
     searchwidget (new SearchWidget),
     settingwidget (new SettingWidget),
-	stackedWidget(new QStackedWidget)
+    loadingwidget (new LoadingWidget),
+    waitingwidget (new WaitingWidget (this)),
+    stackedWidget (new QStackedWidget)
 {
     ui->setupUi (this);
     setCentralWidget (stackedWidget);
-	stackedWidget->addWidget(searchwidget);
-	stackedWidget->addWidget(settingwidget);
-	stackedWidget->setCurrentWidget(searchwidget);
+    stackedWidget->addWidget (searchwidget);
+    stackedWidget->addWidget (settingwidget);
+    stackedWidget->addWidget (loadingwidget);
+    stackedWidget->setCurrentWidget (loadingwidget);
+    waitingwidget->setGeometry (0, 0, size().width(), size().height());
+    waitingwidget->raise();
+    waitingwidget->hide();
+    connect (this, SIGNAL (signalResize (QResizeEvent*)), waitingwidget, SLOT (setSize (QResizeEvent*)));
     connect (searchwidget, SIGNAL (changeCenterWidget (bool)), this, SLOT (changeCenterWidget (bool)));
     connect (settingwidget, SIGNAL (changeCenterWidget (bool)), this, SLOT (changeCenterWidget (bool)));
     //set language refresh
@@ -49,7 +56,7 @@ MainWindow::MainWindow (QWidget *parent) :
     connect (trayIconMenuActionRestore, SIGNAL (triggered()), this, SLOT (showNormal()));
     trayIconMenu->addAction (trayIconMenuActionRestore);
     trayIconMenuActionQuit = new QAction (tr ("Quit"), this);
-    connect (trayIconMenuActionQuit, SIGNAL (triggered()), qApp, SLOT (quit()));
+    connect (trayIconMenuActionQuit, SIGNAL (triggered()), this, SLOT (onQuit()));
     trayIconMenu->addAction (trayIconMenuActionQuit);
     trayIcon->setContextMenu (trayIconMenu);
     connect (trayIcon, SIGNAL (activated (QSystemTrayIcon::ActivationReason)), this,
@@ -71,7 +78,7 @@ MainWindow::MainWindow (QWidget *parent) :
 
     //connect between UI with CoreMgr for app initial
     connect (data_coreMgr, SIGNAL (appInitStart()), this, SLOT (appInitStart()));
-    connect (data_coreMgr, SIGNAL (appInitProgress (int, QString)), this, SLOT (appInitProgress (int, QString)));
+    connect (data_coreMgr, SIGNAL (appInitProgress (int, QString)), loadingwidget, SLOT (appInitProgress (int, QString)));
     connect (data_coreMgr, SIGNAL (appInitEnd()), this, SLOT (appInitEnd()));
 }
 
@@ -87,11 +94,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::changeCenterWidget (bool isSearchwidget)
 {
-	if (isSearchwidget)
-		stackedWidget->setCurrentWidget(settingwidget);
-	else
-		stackedWidget->setCurrentWidget(searchwidget);
+    if (isSearchwidget)
+        stackedWidget->setCurrentWidget (settingwidget);
+    else
+        stackedWidget->setCurrentWidget (searchwidget);
 }
+
 void MainWindow::onSystemTrayIconClicked (QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason)
@@ -124,11 +132,40 @@ void MainWindow::languageRefresh()
 void MainWindow::appInitStart()
 {
 }
-void MainWindow::appInitProgress (int percent, QString detail)
-{
-    Log::v (detail.toStdWString());
-}
+
 void MainWindow::appInitEnd()
 {
+    loadingwidget->appInitProgress (100, tr ("Finish."));
+    stackedWidget->setCurrentWidget (searchwidget);
+}
+
+void MainWindow::resizeEvent (QResizeEvent *e)
+{
+    QMainWindow::resizeEvent (e);
+    emit signalResize (e);
+}
+
+void MainWindow::showWaiting()
+{
+    waitingwidget->show();
+    waitingwidget->raise();
+}
+void MainWindow::hideWaiting()
+{
+    waitingwidget->hide();
+}
+
+void MainWindow::onQuit()
+{
+	showWaiting();
+	CreateThread(NULL,0,QuitFunc,NULL,0,NULL);
+}
+
+DWORD WINAPI MainWindow::QuitFunc(LPVOID in)
+{
+	//destroy global data
+	DestroyGlobalData();
+	qApp->quit();
+	return 0;
 }
 ///:~
