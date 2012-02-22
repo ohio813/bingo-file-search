@@ -19,6 +19,7 @@
 #define SEARCHWIDGET_H
 
 #include <QWidget>
+#include <QTimer>
 #include "../core/File.h"
 
 namespace Ui
@@ -55,11 +56,14 @@ public slots:
     //language refresh
     void languageRefresh();
     void changeCenterWidgetReq();
+	void refreshSearchResReq();
+	void refreshSearchRes();
 signals:
     void explains();
     void changeCenterWidget (bool isSearchwidget);
 private:
     Ui::SearchWidget *ui;
+	QTimer *timer;
 };
 
 #endif // SEARCHWIDGET_H

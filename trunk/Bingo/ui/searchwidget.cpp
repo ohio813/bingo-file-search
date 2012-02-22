@@ -25,11 +25,45 @@ SearchWidget::SearchWidget (QWidget *parent) :
     ui->setupUi (this);
     ui->toolBox->setCurrentIndex (0);
     connect (ui->pushButton_3, SIGNAL (clicked()), this, SLOT (changeCenterWidgetReq()));
+    connect (ui->lineEdit, SIGNAL (textChanged (const QString &)), this, SLOT (refreshSearchResReq()));
+    connect (ui->checkBox_2, SIGNAL (stateChanged (int)), this, SLOT (refreshSearchResReq()));
+    connect (ui->checkBox, SIGNAL (stateChanged (int)), this, SLOT (refreshSearchResReq()));
+    connect (ui->radioButton_3, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    connect (ui->dateTimeEdit, SIGNAL (dateTimeChanged (const QDateTime &)), this, SLOT (refreshSearchResReq()));
+    connect (ui->dateTimeEdit_2, SIGNAL (dateTimeChanged (const QDateTime &)), this, SLOT (refreshSearchResReq()));
+    connect (ui->radioButton_5, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    connect (ui->dateTimeEdit_3, SIGNAL (dateTimeChanged (const QDateTime &)), this, SLOT (refreshSearchResReq()));
+    connect (ui->dateTimeEdit_4, SIGNAL (dateTimeChanged (const QDateTime &)), this, SLOT (refreshSearchResReq()));
+    connect (ui->radioButton, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    connect (ui->doubleSpinBox_3, SIGNAL (valueChanged (double)), this, SLOT (refreshSearchResReq()));
+    connect (ui->doubleSpinBox_4, SIGNAL (valueChanged (double)), this, SLOT (refreshSearchResReq()));
+    connect (ui->comboBox_3, SIGNAL (currentIndexChanged (int)), this, SLOT (refreshSearchResReq()));
+    connect (ui->comboBox_4, SIGNAL (currentIndexChanged (int)), this, SLOT (refreshSearchResReq()));
+    connect (ui->radioButton_4, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    connect (ui->checkBox_3, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    connect (ui->checkBox_4, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    connect (ui->checkBox_5, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    connect (ui->checkBox_6, SIGNAL (toggled (bool)), this, SLOT (refreshSearchResReq()));
+    timer = new QTimer();
+    timer->setSingleShot (true);
+    connect (timer, SIGNAL (timeout ()), this, SLOT (refreshSearchRes()));
 }
 
 SearchWidget::~SearchWidget()
 {
     delete ui;
+}
+
+void SearchWidget::refreshSearchRes()
+{
+}
+
+void SearchWidget::refreshSearchResReq()
+{
+    if (timer->isActive())
+        timer->stop();
+
+    timer->start (800);
 }
 
 void SearchWidget::languageRefresh()
@@ -62,7 +96,7 @@ void SearchWidget::languageRefresh()
 
 void SearchWidget::changeCenterWidgetReq()
 {
-	emit changeCenterWidget(true);
+    emit changeCenterWidget (true);
 }
 
 bool SearchWidget::isRegularMatchFilterOn()
