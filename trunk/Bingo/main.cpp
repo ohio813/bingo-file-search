@@ -52,9 +52,6 @@ int main (int argc, char *argv[])
     MainWindow w;
     w.show();
     data_coreMgr->start();
-    int retCode = a.exec();
-    //destroy global data
-    DestroyGlobalData();
-    return retCode;
+    return a.exec();;
 }
 ///:~

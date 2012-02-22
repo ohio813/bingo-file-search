@@ -51,6 +51,8 @@ void CoreMgr::run()
     data_Moniter = data_MemPool->mallocClass<Moniter>();
     QVector<PathGen*> pathGenVector;
     QSet<char> scanVolSet;
+    double volCount = static_cast<double> (data_VolInfos->m_volinfos.size());
+    double curVol = 0;
 
     for (std::set<VolInfoNode, std::less<VolInfoNode>>::iterator ptr = data_VolInfos->m_volinfos.begin()
             ; ptr != data_VolInfos->m_volinfos.end(); ++ptr)
@@ -61,6 +63,7 @@ void CoreMgr::run()
 
             if (!data_configDB->m_Disable.contains (Path))
             {
+                emit appInitProgress (static_cast<int> (curVol / volCount * 80), tr ("Scanning volume - %1:\\").arg (Path));
                 VolUSN *volUSN = data_MemPool->mallocClass<VolUSN, const wchar_t> (ptr->Path);
 
                 if (!volUSN->StartUp())
@@ -73,9 +76,12 @@ void CoreMgr::run()
                 scanVolSet.insert (Path);
             }
         }
+
+        curVol++;
     }
 
     Log::v (L"CoreMgr:scan finished.");
+	emit appInitProgress (80, tr ("Generate path."));
     data_MemPool->gc();
     foreach (QString tablename, data_masterDB->getAllTables())
     {

@@ -24,6 +24,8 @@
 #include <QtNetwork/QLocalSocket>
 #include "searchwidget.h"
 #include "settingwidget.h"
+#include "loadingwidget.h"
+#include "waitingwidget.h"
 
 namespace Ui
 {
@@ -38,7 +40,7 @@ public:
     explicit MainWindow (QWidget *parent = 0);
     ~MainWindow();
 public slots:
-    void changeCenterWidget(bool isSearchwidget);
+    void changeCenterWidget (bool isSearchwidget);
     //System Tray Icon
     void onSystemTrayIconClicked (QSystemTrayIcon::ActivationReason reason);
     //connect to other instance of this app, to ensure there's only one instance running in Desktop.
@@ -47,8 +49,16 @@ public slots:
     void languageRefresh();
     //app initial
     void appInitStart();
-    void appInitProgress (int percent, QString detail);
-    void appInitEnd();
+	void appInitEnd();
+	void showWaiting();
+	void hideWaiting();
+	void onQuit();
+signals:
+    void explains();
+    void signalResize (QResizeEvent *);
+protected:
+    void resizeEvent (QResizeEvent *);
+	static DWORD WINAPI QuitFunc(LPVOID in);
 private:
     Ui::MainWindow *ui;
     //System Tray Icon
@@ -59,10 +69,12 @@ private:
     //connect to other instance of this app, to ensure there's only one instance running in Desktop.
     QLocalServer *localServer;
     //Widget
-	bool isSearchwidget;
+    bool isSearchwidget;
     SearchWidget *searchwidget;
     SettingWidget *settingwidget;
-	QStackedWidget *stackedWidget;
+    LoadingWidget *loadingwidget;
+    WaitingWidget *waitingwidget;
+    QStackedWidget *stackedWidget;
 };
 
 #endif // MAINWINDOW_H

@@ -30,6 +30,8 @@ SOURCES += main.cpp\
     ui/searchwidget.cpp \
     ui/mainwindow.cpp \
     ui/Language.cpp \
+	ui/loadingwidget.cpp \
+	ui/waitingwidget.cpp \
     util/StringConvert.cpp \
     util/PathDB.cpp \
     util/MasterDB.cpp \
@@ -56,6 +58,8 @@ HEADERS  += util/StringConvert.h \
     ui/mainwindow.h \
     ui/Language.h \
     ui/IconCache.hpp \
+	ui/loadingwidget.h \
+	ui/waitingwidget.h \
     util/StringConvert.h \
     util/PathDB.h \
     util/MasterDB.h \
@@ -67,7 +71,9 @@ HEADERS  += util/StringConvert.h \
 
 FORMS    += ui/mainwindow.ui \
     ui/settingwidget.ui \
-    ui/searchwidget.ui
+    ui/searchwidget.ui \
+	ui/loadingwidget.ui \
+	ui/waitingwidget.ui
 
 RESOURCES += \
     ui/resource.qrc
