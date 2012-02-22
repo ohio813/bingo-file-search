@@ -32,6 +32,8 @@ SOURCES += main.cpp\
     ui/Language.cpp \
 	ui/loadingwidget.cpp \
 	ui/waitingwidget.cpp \
+	ui/DispModel.cpp \
+	ui/dispview.cpp \
     util/StringConvert.cpp \
     util/PathDB.cpp \
     util/MasterDB.cpp \
@@ -59,6 +61,8 @@ HEADERS  += util/StringConvert.h \
     ui/Language.h \
     ui/IconCache.hpp \
 	ui/loadingwidget.h \
+	ui/DispModel.h \
+	ui/dispview.h \
 	ui/waitingwidget.h \
     util/StringConvert.h \
     util/PathDB.h \
