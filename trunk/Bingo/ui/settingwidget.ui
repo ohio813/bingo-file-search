@@ -157,7 +157,44 @@
          </widget>
         </item>
         <item>
-         <widget class="QTableWidget" name="tableWidget"/>
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Volume</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Volume Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>File System</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Total Size</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Free Size</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>State</string>
+           </property>
+          </column>
+         </widget>
         </item>
        </layout>
       </item>

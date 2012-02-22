@@ -19,6 +19,23 @@
 #define SETTINGWIDGET_H
 
 #include <QWidget>
+#include <QPushButton>
+
+class VolSettingBtn : public QPushButton
+{
+    Q_OBJECT
+public:
+    enum State {Active, Deactive, NotSupport};
+    explicit VolSettingBtn (char Path, State state, QWidget *parent = 0);
+    ~VolSettingBtn() {}
+    bool event (QEvent * e);
+public slots:
+    void setOutLook();
+    void setHoverOutLook();
+private:
+    char m_path;
+    State m_state;
+};
 
 namespace Ui
 {
@@ -32,10 +49,11 @@ class SettingWidget : public QWidget
 public:
     explicit SettingWidget (QWidget *parent = 0);
     ~SettingWidget();
+	void setTable();
 public slots:
     //language refresh
     void languageRefresh();
-	void langApply();
+    void langApply();
     void changeCenterWidgetReq();
 signals:
     void explains();

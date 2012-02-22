@@ -31,11 +31,15 @@ public:
     ~CoreMgr();
 	void run();
 	QList<char> listCurVols();
+	void Active(char Path);
+	void DisActive(char Path);
 signals:
     void explains();
     void appInitStart();
     void appInitProgress (int percent, QString detail);
-    void appInitEnd();
+	void appInitEnd(bool gotosearch);
+	void beginWait();
+	void endWait();
 public slots:
 private:
     QMap<char, VolUSN*> m_VolUsns;

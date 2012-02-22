@@ -22,6 +22,7 @@
 #include <QMovie>
 #include <QLabel>
 #include <QResizeEvent>
+#include <QTimer>
 
 namespace Ui
 {
@@ -35,12 +36,15 @@ class WaitingWidget : public QWidget
 public:
     explicit WaitingWidget (QWidget *parent = 0);
     ~WaitingWidget();
+	void Begin();
+	void End();
 public slots:
 	void setSize(QResizeEvent *event);
 private:
     Ui::WaitingWidget *ui;
     QMovie *movie;
 	QLabel *background;
+	QTimer *timer;
 };
 
 #endif // WAITINGWIDGET_H
