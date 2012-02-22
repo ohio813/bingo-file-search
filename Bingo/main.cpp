@@ -52,6 +52,6 @@ int main (int argc, char *argv[])
     MainWindow w;
     w.show();
     data_coreMgr->start();
-    return a.exec();;
+    return a.exec();
 }
 ///:~
