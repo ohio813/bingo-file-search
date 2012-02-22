@@ -39,6 +39,12 @@ CoreMgr::~CoreMgr()
     }
 }
 
+
+QList<char> CoreMgr::listCurVols()
+{
+	return m_VolUsns.keys();
+}
+
 void CoreMgr::run()
 {
     emit appInitStart();
