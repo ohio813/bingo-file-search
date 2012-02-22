@@ -29,7 +29,8 @@ class CoreMgr: public QThread
 public:
     CoreMgr();
     ~CoreMgr();
-    void run();
+	void run();
+	QList<char> listCurVols();
 signals:
     void explains();
     void appInitStart();
