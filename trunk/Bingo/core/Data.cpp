@@ -33,8 +33,9 @@ IconCache *uidata_iconCahe;
 
 void InitGlobalData()
 {
-    data_MemPool = new MemoryPool();
-    uidata_Lang = data_MemPool->mallocClass<Language>();
+	data_MemPool = new MemoryPool();
+	uidata_Lang = data_MemPool->mallocClass<Language>();
+	uidata_iconCahe = data_MemPool->mallocClass<IconCache>();
     data_VolHandles = data_MemPool->mallocClass<VolHandleMgr>();
     NTFS::data_volNTFSInfoCache = data_MemPool->mallocClass<NTFS::VolNTFSInfoCache>();
     data_coreMgr = data_MemPool->mallocClass<CoreMgr>();
@@ -49,6 +50,7 @@ void DestroyGlobalData()
     data_MemPool->freeClass (NTFS::data_volNTFSInfoCache);
     data_MemPool->freeClass (data_VolInfos);
     data_MemPool->freeClass (data_VolHandles);
+	data_MemPool->freeClass (uidata_iconCahe);
     data_MemPool->freeClass (uidata_Lang);
     delete data_MemPool;
 }
