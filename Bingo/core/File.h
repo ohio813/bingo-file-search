@@ -63,16 +63,30 @@ __forceinline unsigned __int32 FileSizeinKB (unsigned __int64 size)
 }
 __forceinline QString FileSizeinStr (unsigned __int32 size)
 {
-	QString str;
+    QString str;
 
-	if (size < 1024)
-		str.sprintf ("%d KB", size);
-	else if (size < 1048576)
-		str.sprintf ("%.2f MB", size / 1024.0);
-	else
-		str.sprintf ("%.2f GB", size / 1048576.0);
+    if (size < 1024)
+        str.sprintf ("%d KB", size);
+    else if (size < 1048576)
+        str.sprintf ("%.2f MB", size / 1024.0);
+    else
+        str.sprintf ("%.2f GB", size / 1048576.0);
 
-	return std::move (str);
+    return std::move (str);
+}
+
+__forceinline QString VolSizeinStr (unsigned long long size)
+{
+    QString str;
+
+    if (size <  1073741824)
+        str.sprintf ("%d MB", size >> 20);
+    else if (size < 1099511627776)
+        str.sprintf ("%d GB", size >> 30);
+    else
+        str.sprintf ("%d TB", size >> 40);
+
+    return std::move (str);
 }
 #endif
 ///:~

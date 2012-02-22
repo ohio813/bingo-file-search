@@ -39,12 +39,68 @@ CoreMgr::~CoreMgr()
     }
 }
 
-
 QList<char> CoreMgr::listCurVols()
 {
-	return m_VolUsns.keys();
+    return m_VolUsns.keys();
 }
 
+void CoreMgr::Active (char Path)
+{
+    if (m_VolUsns.contains (Path))
+        return;
+
+    emit appInitStart();
+    emit appInitProgress (0, tr ("Scanning volume - %1:\\").arg (Path));
+    data_masterDB->beginwrite();
+
+    for (std::set<VolInfoNode, std::less<VolInfoNode>>::iterator ptr = data_VolInfos->m_volinfos.begin()
+            ; ptr != data_VolInfos->m_volinfos.end(); ++ptr)
+    {
+        if (ptr->isLocalDisk && ptr->isMounted && ptr->isNTFS)
+        {
+            char _Path = WChartoCharLetter (ptr->Path);
+
+            if (Path == _Path)
+            {
+                if (data_configDB->m_Disable.contains (Path))
+                    data_configDB->m_Disable.erase (data_configDB->m_Disable.find (Path));
+
+                VolUSN *volUSN = data_MemPool->mallocClass<VolUSN, const wchar_t> (ptr->Path);
+
+                if (!volUSN->StartUp())
+                    break;
+
+                m_VolUsns.insert (Path, volUSN);
+                data_MemPool->gc();
+                emit appInitProgress (50, tr ("Generate path."));
+                PathGen *pathGen = data_MemPool->mallocClass<PathGen>();
+                pathGen->setPath (Path);
+                pathGen->start();
+                pathGen->wait();
+                data_MemPool->free (pathGen);
+                data_MemPool->gc();
+                break;
+            }
+        }
+    }
+
+    data_masterDB->endwrite();
+    emit appInitEnd(false);
+}
+void CoreMgr::DisActive (char Path)
+{
+	emit beginWait();
+    if (m_VolUsns.contains (Path))
+    {
+        data_masterDB->beginwrite();
+        VolUSN * volUSN = m_VolUsns.value (Path);
+        volUSN->Disable();
+        data_MemPool->freeClass (volUSN);
+        data_masterDB->endwrite();
+    }
+	//refresh 
+	emit endWait();
+}
 void CoreMgr::run()
 {
     emit appInitStart();
@@ -87,7 +143,7 @@ void CoreMgr::run()
     }
 
     Log::v (L"CoreMgr:scan finished.");
-	emit appInitProgress (80, tr ("Generate path."));
+    emit appInitProgress (80, tr ("Generate path."));
     data_MemPool->gc();
     foreach (QString tablename, data_masterDB->getAllTables())
     {
@@ -110,7 +166,7 @@ void CoreMgr::run()
     foreach (PathGen * pathGen, pathGenVector) data_MemPool->freeClass (pathGen);
     data_MemPool->gc();
     Log::TimerEnd ("Boot Time:");
-    emit appInitEnd();
+    emit appInitEnd(true);
 }
 
 ///:~

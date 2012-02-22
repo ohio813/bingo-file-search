@@ -49,7 +49,7 @@ public slots:
     void languageRefresh();
     //app initial
     void appInitStart();
-	void appInitEnd();
+	void appInitEnd(bool gotosearch);
 	void showWaiting();
 	void hideWaiting();
 	void onQuit();

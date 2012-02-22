@@ -27,11 +27,14 @@ WaitingWidget::WaitingWidget (QWidget *parent) :
     movie = new QMovie (":/image/waiting.gif");
     ui->label->setMovie (movie);
     ui->label->setWindowOpacity (1);
-	ui->label->raise();
+    ui->label->raise();
     movie->start();
-	background->setStyleSheet("background-color: qlineargradient(spread:reflect, x1:0.920091, y1:0.114, x2:0, y2:1, stop:0.119318 rgba(10, 34, 255, 68), stop:1 rgba(0, 12, 227, 209))");
-	background->lower();
-	background->show();
+    background->setStyleSheet ("background-color: qlineargradient(spread:reflect, x1:0.920091, y1:0.114, x2:0, y2:1, stop:0.119318 rgba(10, 34, 255, 68), stop:1 rgba(0, 12, 227, 209))");
+    background->lower();
+    background->show();
+    timer = new QTimer();
+    timer->setSingleShot (true);
+    connect (timer, SIGNAL (timeout ()), this, SLOT (show()));
 }
 void WaitingWidget::setSize (QResizeEvent *event)
 {
@@ -41,5 +44,16 @@ void WaitingWidget::setSize (QResizeEvent *event)
 WaitingWidget::~WaitingWidget()
 {
     delete ui;
+}
+void WaitingWidget::Begin()
+{
+    timer->start (1500);
+}
+void WaitingWidget::End()
+{
+    if (timer->isActive())
+        timer->stop();
+
+    hide();
 }
 ///:~

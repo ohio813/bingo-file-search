@@ -79,7 +79,9 @@ MainWindow::MainWindow (QWidget *parent) :
     //connect between UI with CoreMgr for app initial
     connect (data_coreMgr, SIGNAL (appInitStart()), this, SLOT (appInitStart()));
     connect (data_coreMgr, SIGNAL (appInitProgress (int, QString)), loadingwidget, SLOT (appInitProgress (int, QString)));
-    connect (data_coreMgr, SIGNAL (appInitEnd()), this, SLOT (appInitEnd()));
+    connect (data_coreMgr, SIGNAL (appInitEnd (bool)), this, SLOT (appInitEnd (bool)));
+    connect (data_coreMgr, SIGNAL (beginWait()), waitingwidget, SLOT (Begin()));
+    connect (data_coreMgr, SIGNAL (endWait()), waitingwidget, SLOT (End()));
 }
 
 MainWindow::~MainWindow()
@@ -131,12 +133,21 @@ void MainWindow::languageRefresh()
 
 void MainWindow::appInitStart()
 {
+    stackedWidget->setCurrentWidget (loadingwidget);
 }
 
-void MainWindow::appInitEnd()
+void MainWindow::appInitEnd (bool gotosearch)
 {
     loadingwidget->appInitProgress (100, tr ("Finish."));
-    stackedWidget->setCurrentWidget (searchwidget);
+
+    //refresh
+    if (gotosearch)
+    {
+        stackedWidget->setCurrentWidget (searchwidget);
+        settingwidget->setTable();
+    }
+    else
+        stackedWidget->setCurrentWidget (settingwidget);
 }
 
 void MainWindow::resizeEvent (QResizeEvent *e)
@@ -157,15 +168,15 @@ void MainWindow::hideWaiting()
 
 void MainWindow::onQuit()
 {
-	showWaiting();
-	CreateThread(NULL,0,QuitFunc,NULL,0,NULL);
+    showWaiting();
+    CreateThread (NULL, 0, QuitFunc, NULL, 0, NULL);
 }
 
-DWORD WINAPI MainWindow::QuitFunc(LPVOID in)
+DWORD WINAPI MainWindow::QuitFunc (LPVOID in)
 {
-	//destroy global data
-	DestroyGlobalData();
-	qApp->quit();
-	return 0;
+    //destroy global data
+    DestroyGlobalData();
+    qApp->quit();
+    return 0;
 }
 ///:~
