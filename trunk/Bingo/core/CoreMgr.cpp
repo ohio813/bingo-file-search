@@ -98,7 +98,7 @@ void CoreMgr::DisActive (char Path)
         data_MemPool->freeClass (volUSN);
         data_masterDB->endwrite();
     }
-	//refresh 
+	emit refreshSearch();
 	emit endWait();
 }
 void CoreMgr::run()

@@ -40,6 +40,7 @@ signals:
 	void appInitEnd(bool gotosearch);
 	void beginWait();
 	void endWait();
+	void refreshSearch();
 public slots:
 private:
     QMap<char, VolUSN*> m_VolUsns;

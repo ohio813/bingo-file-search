@@ -38,14 +38,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QWidget" name="widget" native="true">
-       <zorder>pushButton</zorder>
-       <zorder>horizontalSpacer_3</zorder>
-       <zorder>pushButton_2</zorder>
-       <zorder>horizontalSpacer_2</zorder>
-      </widget>
-     </item>
     </layout>
    </item>
    <item row="0" column="1">

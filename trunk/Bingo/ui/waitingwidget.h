@@ -36,10 +36,10 @@ class WaitingWidget : public QWidget
 public:
     explicit WaitingWidget (QWidget *parent = 0);
     ~WaitingWidget();
-	void Begin();
-	void End();
 public slots:
 	void setSize(QResizeEvent *event);
+	void Begin();
+	void End();
 private:
     Ui::WaitingWidget *ui;
     QMovie *movie;

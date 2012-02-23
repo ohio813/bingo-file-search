@@ -17,6 +17,7 @@
 ///:DispModel.cpp
 #include "DispModel.h"
 #include "..\core\File.h"
+#include "..\core\Data.h"
 
 DispModel::DispModel (QObject *parent) : QSqlQueryModel (parent)
 {
@@ -34,11 +35,6 @@ QVariant DispModel::data (const QModelIndex &index, int role) const
 
     if (role == Qt::TextAlignmentRole)
     {
-        if (index.column() == 0)
-        {
-            return int (Qt::AlignCenter);
-        }
-
         if (index.column() == 1 || index.column() == 2)
         {
             return int (Qt::AlignLeft | Qt::AlignVCenter);
@@ -52,8 +48,8 @@ QVariant DispModel::data (const QModelIndex &index, int role) const
     {
         if (index.column() == 0)
         {
-            //TODO: display icons
-            return "ICONS";
+            QModelIndex _index = index.sibling (index.row(), 1);
+            return QVariant (*uidata_iconCahe->getIcon (_index.data().toString(), FILE_ATTRIBUTE_NORMAL));
         }
         else if (index.column() == 3)
             return FileSizeinStr (value.toInt());
@@ -101,6 +97,10 @@ void DispModel::sort (int column, Qt::SortOrder order)
         _order += "DESC";
     }
 
-    this->setQuery (_order);
+    data_masterDB->beginread();
+    emit waitBegin();
+    this->setQuery (_order, data_masterDB->getDB());
+    emit waitEnd();
+    data_masterDB->endread();
 }
 ///:~

@@ -20,6 +20,7 @@
 #include "Language.h"
 #include "util\Log.h"
 #include "core\Data.h"
+#include "dispview.h"
 
 MainWindow::MainWindow (QWidget *parent) :
     QMainWindow (parent),
@@ -28,9 +29,12 @@ MainWindow::MainWindow (QWidget *parent) :
     settingwidget (new SettingWidget),
     loadingwidget (new LoadingWidget),
     waitingwidget (new WaitingWidget (this)),
-    stackedWidget (new QStackedWidget)
+    stackedWidget (new QStackedWidget),
+    dispview (new DispView)
 {
+    uidata_searchwidget = searchwidget;
     ui->setupUi (this);
+    searchwidget->setTableWidget (dispview);
     setCentralWidget (stackedWidget);
     stackedWidget->addWidget (searchwidget);
     stackedWidget->addWidget (settingwidget);
@@ -82,6 +86,10 @@ MainWindow::MainWindow (QWidget *parent) :
     connect (data_coreMgr, SIGNAL (appInitEnd (bool)), this, SLOT (appInitEnd (bool)));
     connect (data_coreMgr, SIGNAL (beginWait()), waitingwidget, SLOT (Begin()));
     connect (data_coreMgr, SIGNAL (endWait()), waitingwidget, SLOT (End()));
+    connect (searchwidget, SIGNAL (refreshSearchResSignal()), this, SLOT (searchEventWithWait()));
+	connect (data_coreMgr, SIGNAL (refreshSearch()), this, SLOT (searchEvent()));
+	connect (&(dispview->model), SIGNAL (waitBegin()), waitingwidget, SLOT (Begin()));
+	connect (&(dispview->model), SIGNAL (waitEnd()), waitingwidget, SLOT (End()));
 }
 
 MainWindow::~MainWindow()
@@ -139,8 +147,8 @@ void MainWindow::appInitStart()
 void MainWindow::appInitEnd (bool gotosearch)
 {
     loadingwidget->appInitProgress (100, tr ("Finish."));
+    dispview->refresh();
 
-    //refresh
     if (gotosearch)
     {
         stackedWidget->setCurrentWidget (searchwidget);
@@ -170,6 +178,19 @@ void MainWindow::onQuit()
 {
     showWaiting();
     CreateThread (NULL, 0, QuitFunc, NULL, 0, NULL);
+}
+
+void MainWindow::searchEvent()
+{
+    dispview->refresh();
+}
+
+
+void MainWindow::searchEventWithWait()
+{
+    waitingwidget->Begin();
+    dispview->refresh();
+    waitingwidget->End();
 }
 
 DWORD WINAPI MainWindow::QuitFunc (LPVOID in)
