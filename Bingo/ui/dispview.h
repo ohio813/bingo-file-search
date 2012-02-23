@@ -23,6 +23,7 @@
 #include <QTableView>
 #include<QString>
 #include<QSqlDatabase>
+#include "searchwidget.h"
 #include"DispModel.h"
 
 extern SearchWidget *uidata_searchwidget;
@@ -32,18 +33,13 @@ class DispView : public QTableView
     Q_OBJECT
 public:
     explicit DispView (QWidget *parent = 0);
-    DispView (QSqlDatabase &database);
     void refresh();
-private:
     void setSql();
     DispModel model;
-    QString sql;
-
-
 signals:
 
 public slots:
-
+    void slotDoubleClick (const QModelIndex &index);
 };
 
 #endif

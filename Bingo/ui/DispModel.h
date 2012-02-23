@@ -21,14 +21,19 @@
 #include <QSqlQueryModel>
 #include <QSqlDatabase>
 
-class DispModel : public QSqlQueryModel
+class DispModel : public QSqlQueryModel, QObject
 {
+    Q_OBJECT
 public:
     DispModel (QObject *parent = 0);
     void sort (int column, Qt::SortOrder order);
     QString sql;
 private:
     QVariant data (const QModelIndex &index, int role) const;
+signals:
+    void explains();
+    void waitBegin ();
+    void waitEnd ();
 };
 
 #endif

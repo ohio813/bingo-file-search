@@ -56,6 +56,7 @@ SearchWidget::~SearchWidget()
 
 void SearchWidget::refreshSearchRes()
 {
+    emit refreshSearchResSignal();
 }
 
 void SearchWidget::refreshSearchResReq()
@@ -64,6 +65,11 @@ void SearchWidget::refreshSearchResReq()
         timer->stop();
 
     timer->start (800);
+}
+
+void SearchWidget::setTableWidget (QTableView* w)
+{
+    ui->verticalLayout->addWidget (w);
 }
 
 void SearchWidget::languageRefresh()
@@ -104,7 +110,7 @@ bool SearchWidget::isRegularMatchFilterOn()
     return ui->checkBox_2->isChecked();
 }
 
-bool SearchWidget::isFullFathMatchFilterOn()
+bool SearchWidget::isFullPathMatchFilterOn()
 {
     return ui->checkBox->isChecked();
 }

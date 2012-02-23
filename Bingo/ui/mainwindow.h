@@ -26,6 +26,7 @@
 #include "settingwidget.h"
 #include "loadingwidget.h"
 #include "waitingwidget.h"
+#include "dispview.h"
 
 namespace Ui
 {
@@ -53,6 +54,8 @@ public slots:
 	void showWaiting();
 	void hideWaiting();
 	void onQuit();
+	void searchEvent();
+	void searchEventWithWait();
 signals:
     void explains();
     void signalResize (QResizeEvent *);
@@ -75,6 +78,7 @@ private:
     LoadingWidget *loadingwidget;
     WaitingWidget *waitingwidget;
     QStackedWidget *stackedWidget;
+	DispView *dispview;
 };
 
 #endif // MAINWINDOW_H

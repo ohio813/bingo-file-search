@@ -20,6 +20,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QTableView>
 #include "../core/File.h"
 
 namespace Ui
@@ -35,7 +36,7 @@ public:
     explicit SearchWidget (QWidget *parent = 0);
     ~SearchWidget();
     bool isRegularMatchFilterOn();
-    bool isFullFathMatchFilterOn();
+    bool isFullPathMatchFilterOn();
     bool isDateModifiedFilterOn();
     bool isDateCreatedFilterOn();
     bool isSizeFilterOn();
@@ -51,19 +52,21 @@ public:
     DWORD getSizeFilterBegin();
     DWORD getSizeFilterEnd();
     QString getSearchKeyWord();
+    void setTableWidget(QTableView* w);
 
 public slots:
     //language refresh
     void languageRefresh();
     void changeCenterWidgetReq();
-	void refreshSearchResReq();
-	void refreshSearchRes();
+    void refreshSearchResReq();
+    void refreshSearchRes();
 signals:
     void explains();
     void changeCenterWidget (bool isSearchwidget);
+    void refreshSearchResSignal();
 private:
     Ui::SearchWidget *ui;
-	QTimer *timer;
+    QTimer *timer;
 };
 
 #endif // SEARCHWIDGET_H
