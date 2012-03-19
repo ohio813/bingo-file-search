@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/image">
-        <file>logo.png</file>
-		<file>setting.png</file>
-		<file>Search.png</file>
-		<file>waiting.gif</file>
-    </qresource>
-</RCC>
