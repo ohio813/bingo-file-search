@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShellContextMenu", "ShellContextMenu.vcxproj", "{CBF4B4C8-1EE0-4F1A-B72B-2FBE1F9A16CA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBF4B4C8-1EE0-4F1A-B72B-2FBE1F9A16CA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CBF4B4C8-1EE0-4F1A-B72B-2FBE1F9A16CA}.Debug|Win32.Build.0 = Debug|Win32
+		{CBF4B4C8-1EE0-4F1A-B72B-2FBE1F9A16CA}.Release|Win32.ActiveCfg = Release|Win32
+		{CBF4B4C8-1EE0-4F1A-B72B-2FBE1F9A16CA}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

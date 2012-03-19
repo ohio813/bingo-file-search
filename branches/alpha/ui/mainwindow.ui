@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>820</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Bingo</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resource.qrc">
+    <normaloff>:/image/logo.png</normaloff>:/image/logo.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">.MainWindow {
+	background-color: qlineargradient(spread:reflect, x1:0.943, y1:0.96, x2:0.085, y2:0.0794545, stop:0.0340909 rgba(255, 255, 130, 255), stop:0.778409 rgba(250, 255, 198, 255));
+ }</string>
+  </property>
+  <widget class="QWidget" name="centralWidget"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>
