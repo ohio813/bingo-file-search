@@ -31,13 +31,14 @@ echo License Agreement:
 echo.
 FOR /F "tokens=* delims= " %%i IN (%~dp0/license/license.txt) DO echo. %%i
 echo.
-echo If you accept, type 'a'.
+echo If you accept, type 'a' or type 'q' to quit.
 echo To see GPLv3 license, type 'g'; to see LGPLv3 type 'l'.
 SET /P choice= You choice:
 echo.
 if /I "%choice%"=="a" goto accept
 if /I "%choice%"=="g" goto gpl-license
 if /I "%choice%"=="l" goto lgpl-license
+if /I "%choice%"=="q" exit
 goto license
 
 :gpl-license
