@@ -79,7 +79,7 @@ public:
     void DumpPoolTxt (const std::wstring& fileName);
     void DumpPoolScreen ();
 private:
-    void* mallocWithOutSync (size_t Size);
+    void* allocWithOutSync (size_t Size);
     bool AllocateMemory (const std::size_t &Size);
     void FreeAllAllocatedMemory();
     BlockPtr FindBlockSuitableToHoldMemory (const std::size_t &Size);
@@ -121,8 +121,7 @@ T* MemoryPool::allocClass (Arg0& arg0, Arg1& arg1)
     return p;
 }
 template<class T, class Arg0, class Arg1, class Arg2>
-T* MemoryPool:
-mllocClass (Arg0& arg0, Arg1& arg1, Arg2& arg2)
+T* MemoryPool::allocClass (Arg0& arg0, Arg1& arg1, Arg2& arg2)
 {
     T* p = (T*) MemoryPool::alloc (sizeof (T));
     new (p) T (arg0, arg1, arg2);

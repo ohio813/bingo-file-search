@@ -18,7 +18,7 @@
 #ifndef MULTIPROCESSORTHREAD_H
 #define MULTIPROCESSORTHREAD_H
 
-#include "gloabl.h"
+#include "global.h"
 #include "threadsync.h"
 #include <Windows.h>
 

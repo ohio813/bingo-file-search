@@ -24,7 +24,7 @@
 # define BINGO_DLL
 #endif /* BINGO_SHARED */
 
-#include "../common/core/global.h"
+#include "core/global.h"
 
 #endif
 ///:~
