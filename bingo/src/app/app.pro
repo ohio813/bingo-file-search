@@ -4,6 +4,7 @@ QT += gui
 
 TEMPLATE = app
 TARGET = Bingo
+CONFIG += release
 DESTDIR = ../../bin
 
 SOURCES += main.cpp

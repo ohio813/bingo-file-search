@@ -53,7 +53,7 @@ public:
     {
         m_logfile = QString::fromStdWString (logfile);
     }
-    static void setlogfile (const QString % logfile)
+    static void setlogfile (const QString& logfile)
     {
         m_logfile = logfile;
     }
