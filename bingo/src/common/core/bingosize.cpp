@@ -59,6 +59,7 @@ unsigned __int32 BingoSize::toUInt32()
 }
 
 #if !(defined BINGO_SHARED || defined BINGO_DLL)
+#pragma warning (disable : 4630)
 extern
 #endif
 QString VolSizeinStr (unsigned long long size)
