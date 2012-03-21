@@ -25,6 +25,8 @@
 #endif /* BINGO_SHARED */
 
 #include "../common/core/global.h"
+#include "../common/core/bingosize.h"
+#include "../common/core/bingotime.h"
 
 #endif
 ///:~
