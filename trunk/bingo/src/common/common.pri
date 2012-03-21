@@ -10,7 +10,9 @@ DEPENDPATH += $$PWD
 SOURCES = core/threadsync.cpp \
 		  core/multiprocessorthread.cpp \
 		  core/memory.cpp \
-		  core/globaldata.cpp
+		  core/globaldata.cpp \
+		  core/bingotime.cpp \
+		  core/bingosize.cpp
 
 HEADERS = core/global.h \
           core/threadsync.h \
@@ -20,4 +22,6 @@ HEADERS = core/global.h \
 		  core/globaldata.h \
 		  core/stringconvert.h \
 		  core/lrucache.hpp\
-		  core/blockingqueue.hpp
+		  core/blockingqueue.hpp \
+		  core/bingotime.h \
+		  core/bingosize.h
