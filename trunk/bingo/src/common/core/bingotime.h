@@ -23,24 +23,24 @@
 #include <QString>
 #include <QDateTime>
 
-BINGO_BEGIN_NAMESPACE
 BINGO_BEGIN_HEADER
+BINGO_BEGIN_NAMESPACE
 
 class B_LIB_EXPORT BingoTime
 {
 public:
     BingoTime();
     explicit BingoTime (const unsigned __int32 &time);
-    inline static BingoTime fromFileTime (const FILETIME &fileTime);
-    inline static BingoTime fromLocalFileTime (const FILETIME &localfileTime);
-    inline static BingoTime fromSysTime (const SYSTEMTIME &sysTime);
-    inline static BingoTime fromQDateTime (const QDateTime &qDTime);
-    inline SYSTEMTIME toSysTime();
-    inline FILETIME toFileTime();
-    inline FILETIME toLocalFileTime();
-    inline QDateTime toQDateTime();
-    inline QString toString();
-    inline unsigned __int32 toUInt32();
+    static BingoTime fromFileTime (const FILETIME &fileTime);
+    static BingoTime fromLocalFileTime (const FILETIME &localfileTime);
+    static BingoTime fromSysTime (const SYSTEMTIME &sysTime);
+    static BingoTime fromQDateTime (const QDateTime &qDTime);
+    SYSTEMTIME toSysTime();
+    FILETIME toFileTime();
+    FILETIME toLocalFileTime();
+    QDateTime toQDateTime();
+    QString toString();
+    unsigned __int32 toUInt32();
 private:
     unsigned __int32 m_time;
     enum {BINGOTIME_YEAR_START = 1970};
@@ -52,8 +52,8 @@ private:
     */
 };
 
-BINGO_END_HEADER
 BINGO_END_NAMESPACE
+BINGO_END_HEADER
 
 #endif
 ///:~

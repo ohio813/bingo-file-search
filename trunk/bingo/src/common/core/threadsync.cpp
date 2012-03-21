@@ -17,7 +17,7 @@
 ///:threadsync.cpp
 
 #include "threadsync.h"
-BINGO_USE_NAMESPACE
+BINGO_BEGIN_NAMESPACE
 
 Mutex::Mutex ()
 {
@@ -123,4 +123,5 @@ void ReadWriteSync::endwrite()
     m_WriteLock.unlock();
 }
 
+BINGO_END_NAMESPACE
 ///:~

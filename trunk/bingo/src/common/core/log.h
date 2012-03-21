@@ -210,34 +210,35 @@ private:
     }
     static void logStr (const QString& context)
     {
-        qDebug() << context;
+        synchronized (m_logMutex)
+        {
+#if defined LOG_OUTPUT_TO_SCREEN
+            QTextStream stream (stdout, QIODevice::WriteOnly);
+            stream << context << endl;
+            stream.flush();
+#endif
+#if defined _DEBUG || defined DEBUG
+            OutputDebugStringW ( (context.toStdWString() + L"\r\n").c_str());
+#endif
 
-        if (m_enable)
-            writelogfile (QDateTime::currentDateTime().toString ("YYYY-MM-dd H:m:s z ") + context);
+            if (m_enable)
+                writelogfile (QDateTime::currentDateTime().toString ("yyyy-MM-dd HH:mm:ss zzz ") + context);
+        }
     }
     static void writelogfile (const QString& context)
     {
-        synchronized (m_logMutex)
+        QFile file (m_logfile);
+
+        if (file.open (QIODevice::Append | QIODevice::WriteOnly))
         {
-            QFile file (m_logfile);
-
-            if (file.open (QIODevice::Append | QIODevice::WriteOnly))
-            {
-                QTextStream stream (&file);
-                stream << context << endl;
-                stream.flush();
-            }
-
-            file.close();
+            QTextStream stream (&file);
+            stream << context << endl;
+            stream.flush();
         }
+
+        file.close();
     }
 };
-
-bool Log::m_enable = false;
-bool Log::m_firstenable = true;
-QString Log::m_logfile = ".log";
-Mutex Log::m_logMutex = Mutex();
-QTime Log::m_timerBegin = QTime();
 
 BINGO_END_NAMESPACE
 

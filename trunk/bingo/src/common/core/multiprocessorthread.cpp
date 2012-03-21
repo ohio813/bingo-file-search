@@ -17,7 +17,7 @@
 ///:multiprocessorthread.cpp
 
 #include "multiprocessorthread.h"
-BINGO_USE_NAMESPACE
+BINGO_BEGIN_NAMESPACE
 
 DWORD_PTR MultiProcessorThread::ProcessorCount = GetNumCPUs();
 DWORD_PTR MultiProcessorThread::RunningThreadCount = 0;
@@ -128,4 +128,6 @@ DWORD_PTR MultiProcessorThread::getProcessorMask()
 {
     return m_ProcessorMask;
 }
+
+BINGO_END_NAMESPACE
 ///:~

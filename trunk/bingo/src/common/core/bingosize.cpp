@@ -17,7 +17,7 @@
 ///:bingosize.cpp
 
 #include "bingosize.h"
-BINGO_USE_NAMESPACE
+BINGO_BEGIN_NAMESPACE
 
 BingoSize::BingoSize()
 {
@@ -75,4 +75,6 @@ QString VolSizeinStr (unsigned long long size)
 
     return std::move (str);
 }
+
+BINGO_END_NAMESPACE
 ///:~

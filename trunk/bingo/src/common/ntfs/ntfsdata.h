@@ -14,42 +14,18 @@
 *   You should have received a copy of the GNU Lesser General Public
 *   License along with this library. If not, see <http://www.gnu.org/licenses/>.
 */
-///:bingosize.h
-#ifndef BINGOSIZE_H
-#define BINGOSIZE_H
+///:ntfsdata.h
+#ifndef NTFSDATA_H
+#define NTFSDATA_H
 
-#include "global.h"
-#include <QString>
-
-BINGO_BEGIN_HEADER
+#include "../core/global.h"
+#include "../core/globaldata.h"
 BINGO_BEGIN_NAMESPACE
 
-class B_LIB_EXPORT BingoSize
-{
-public:
-    BingoSize();
-    explicit BingoSize (const unsigned __int32 &size);
-    static BingoSize fromByte (const unsigned __int64 &size);
-    unsigned __int64 toByte();
-    QString toString();
-    unsigned __int32 toUInt32();
-private:
-    unsigned __int32 m_size;
-    /**
-    * BingoSize definition:
-    *   A 32-bit unsigned int to store the
-    *   file size in KB.
-    */
-};
-
-#if defined BINGO_SHARED || defined BINGO_DLL
-B_LIB_EXPORT QString VolSizeinStr (unsigned long long size);
-#else
-__forceinline QString VolSizeinStr (unsigned long long size);
-#endif
+inline void initNTFSData();
+inline void destroyNTFSData();
 
 BINGO_END_NAMESPACE
-BINGO_END_HEADER
 
 #endif
 ///:~

@@ -17,8 +17,25 @@
 ///:globaldata.cpp
 
 #include "globaldata.h"
-BINGO_USE_NAMESPACE
+#include "log.h"
+#include "../ntfs/ntfsdata.h"
+#pragma warning (disable : 4630)
+
+BINGO_BEGIN_NAMESPACE
 
 MemoryPool g_mempool;
+
+extern void initGlobalData()
+{
+    Log::v (L"initial global data.");
+    initNTFSData();
+}
+extern void destroyGlobalData()
+{
+    Log::v (L"destroy global data.");
+    destroyNTFSData();
+}
+
+BINGO_END_NAMESPACE
 
 ///:~
