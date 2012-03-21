@@ -25,6 +25,9 @@ BINGO_BEGIN_NAMESPACE
 
 extern MemoryPool g_mempool;
 
+inline void initGlobalData();
+inline void destroyGlobalData();
+
 BINGO_END_NAMESPACE
 
 #endif

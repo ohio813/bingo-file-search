@@ -1,4 +1,5 @@
 QT = core \
+	 gui \
 	 sql \
 	 network
 	 
@@ -9,5 +10,6 @@ CONFIG += console release
 INCLUDEPATH += ../../include
 Release:LIBS += ../../lib/Bingo.lib
 Debug:LIBS += ../../lib/Bingod.lib
+DEFINES += LOG_OUTPUT_TO_SCREEN
 
 SOURCES = main.cpp

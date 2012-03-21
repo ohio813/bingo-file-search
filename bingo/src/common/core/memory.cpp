@@ -16,12 +16,12 @@
 */
 ///:memory.cpp
 #include "memory.h"
-#include "log.hpp"
+#include "log.h"
 #include <stdio.h>
 #include <cmath>
 #include <assert.h>
 using namespace std;
-BINGO_USE_NAMESPACE
+BINGO_BEGIN_NAMESPACE
 
 void DumpBin (void* pSrc, size_t Size, const std::wstring& fileName)
 {
@@ -589,4 +589,6 @@ void MemoryPool::LinkBlocksToData (unsigned int BlockCount, unsigned char *ptrNe
     }
 }
 #pragma endregion MemoryPool
+
+BINGO_END_NAMESPACE
 ///:~

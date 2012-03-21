@@ -14,42 +14,17 @@
 *   You should have received a copy of the GNU Lesser General Public
 *   License along with this library. If not, see <http://www.gnu.org/licenses/>.
 */
-///:bingosize.h
-#ifndef BINGOSIZE_H
-#define BINGOSIZE_H
+///:log.cpp
 
 #include "global.h"
-#include <QString>
-
-BINGO_BEGIN_HEADER
+#include "log.h"
 BINGO_BEGIN_NAMESPACE
 
-class B_LIB_EXPORT BingoSize
-{
-public:
-    BingoSize();
-    explicit BingoSize (const unsigned __int32 &size);
-    static BingoSize fromByte (const unsigned __int64 &size);
-    unsigned __int64 toByte();
-    QString toString();
-    unsigned __int32 toUInt32();
-private:
-    unsigned __int32 m_size;
-    /**
-    * BingoSize definition:
-    *   A 32-bit unsigned int to store the
-    *   file size in KB.
-    */
-};
-
-#if defined BINGO_SHARED || defined BINGO_DLL
-B_LIB_EXPORT QString VolSizeinStr (unsigned long long size);
-#else
-__forceinline QString VolSizeinStr (unsigned long long size);
-#endif
+bool Log::m_enable = false;
+bool Log::m_firstenable = true;
+QString Log::m_logfile = ".log";
+Mutex Log::m_logMutex = Mutex();
+QTime Log::m_timerBegin = QTime();
 
 BINGO_END_NAMESPACE
-BINGO_END_HEADER
-
-#endif
 ///:~

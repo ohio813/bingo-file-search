@@ -24,6 +24,8 @@ qmake "CONFIG-=release" app.pro -tp vc -o app.vcxproj
 cd %~dp0\..
 echo Generate bingo.sln
 del /f /q bingo.sln >nul 2>nul
+del /f /q bingo.sdf >nul 2>nul
+del /f /q bingo.suo >nul 2>nul
 "%~dp0\slncreator.exe" -o "%~dp0\../bingo.sln" -proj "%~dp0\../src/lib/lib.vcxproj" "%~dp0\../src/libdemo/libdemo.vcxproj" "%~dp0\../src/server/server.vcxproj" "%~dp0\../src/app/app.vcxproj"
 echo Visual Studio Solution Generate Finish.
 pause

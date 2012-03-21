@@ -19,7 +19,7 @@
 #include "bingotime.h"
 #include <QDate>
 #include <QTime>
-BINGO_USE_NAMESPACE
+BINGO_BEGIN_NAMESPACE
 
 BingoTime::BingoTime()
 {
@@ -114,4 +114,6 @@ unsigned __int32 BingoTime::toUInt32()
 {
     return m_time;
 }
+
+BINGO_END_NAMESPACE
 ///:~
