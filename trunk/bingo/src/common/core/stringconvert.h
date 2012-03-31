@@ -29,7 +29,7 @@ inline QByteArray Unicode2UTF (const wchar_t* buf, int len)
 {
     int targetlen = WideCharToMultiByte (CP_UTF8, 0, buf, len, NULL, 0, NULL, NULL);
     char* utf8 = (char*) g_mempool.alloc (targetlen * sizeof (char));
-    WideCharToMultiByte (CP_UTF8, 0, buf, len, &utf8[0], targetlen, NULL, NULL);
+    WideCharToMultiByte (CP_UTF8, 0, buf, len, utf8, targetlen, NULL, NULL);
     QByteArray ret (utf8, targetlen);
     g_mempool.free (utf8);
     return std::move (ret);
