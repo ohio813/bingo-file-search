@@ -14,7 +14,13 @@ SOURCES = core/threadsync.cpp \
 		  core/globaldata.cpp \
 		  core/bingotime.cpp \
 		  core/bingosize.cpp \
-		  ntfs/ntfsdata.cpp
+		  core/bingomgr.cpp \
+		  ntfs/ntfsdata.cpp \
+		  ntfs/volhandlemgr.cpp \
+		  ntfs/mft.cpp \
+		  ntfs/bingovolinfomgr.cpp \
+		  db/masterdb.cpp \
+		  db/pathgen.cpp
 
 HEADERS = core/global.h \
           core/threadsync.h \
@@ -27,4 +33,11 @@ HEADERS = core/global.h \
 		  core/blockingqueue.hpp \
 		  core/bingotime.h \
 		  core/bingosize.h \
-		  ntfs/ntfsdata.h
+		  core/bingomgr.h \
+		  ntfs/ntfsdata.h \
+		  ntfs/volhandlemgr.h \
+		  ntfs/mft.h \
+		  ntfs/bingovolinfomgr.h \
+		  db/dbcopy.h \
+		  db/masterdb.h \
+		  db/pathgen.h
