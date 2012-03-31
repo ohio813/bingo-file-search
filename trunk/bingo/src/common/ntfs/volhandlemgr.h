@@ -14,30 +14,33 @@
 *   You should have received a copy of the GNU Lesser General Public
 *   License along with this library. If not, see <http://www.gnu.org/licenses/>.
 */
-///:ntfsdata.cpp
+///:volhandlemgr.h
+#ifndef VOLHANDLEMGR_H
+#define VOLHANDLEMGR_H
 
 #include "../core/global.h"
-#include "../core/globaldata.h"
-#include "ntfsdata.h"
-#include "../core/log.h"
-#pragma warning (disable : 4630)
+#include <Windows.h>
+#include <wchar.h>
+
 BINGO_BEGIN_NAMESPACE
-
-VolMFTInfoCache *g_volMFTInfoCache;
-VolHandleMgr *g_volHandles;
-
-extern void initNTFSData()
+class VolHandleMgr
 {
-    Log::v (L"initial ntfs data.");
-    g_volHandles = g_mempool.allocClass<VolHandleMgr>();
-    g_volMFTInfoCache = g_mempool.allocClass<VolMFTInfoCache>();
-}
-extern void destroyNTFSData()
-{
-    Log::v (L"destory ntfs data.");
-    g_mempool.freeClass (g_volMFTInfoCache);
-    g_mempool.freeClass (g_volHandles);
-}
-
+public:
+    VolHandleMgr();
+    ~VolHandleMgr();
+    HANDLE operator [] (char Letter);
+    HANDLE operator [] (wchar_t Letter);
+    bool open (char Letter);
+    bool open (wchar_t Letter);
+    void close (char Letter);
+    void close (wchar_t Letter);
+    bool isopen (char Letter);
+    bool isopen (wchar_t Letter);
+private:
+    HANDLE m_hVols[26];
+    bool _open (int i);
+    void _close (int i);
+};
 BINGO_END_NAMESPACE
+#endif
 ///:~

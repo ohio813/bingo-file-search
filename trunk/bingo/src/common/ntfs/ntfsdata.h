@@ -19,8 +19,12 @@
 #define NTFSDATA_H
 
 #include "../core/global.h"
-#include "../core/globaldata.h"
+#include "volhandlemgr.h"
+#include "mft.h"
 BINGO_BEGIN_NAMESPACE
+
+extern VolMFTInfoCache *g_volMFTInfoCache;
+extern VolHandleMgr *g_volHandles;
 
 inline void initNTFSData();
 inline void destroyNTFSData();
